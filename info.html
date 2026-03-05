@@ -30,6 +30,10 @@
     .wrap{max-width:980px;margin:0 auto;padding:26px 16px 64px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
     .logo{width:220px;height:auto;display:block}.nav{display:flex;gap:8px;flex-wrap:wrap}
     .btn{border:1px solid var(--border);border-radius:10px;padding:9px 11px;text-decoration:none;color:var(--text);background:#fff;font-weight:600}
+    .lang-switch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:7px 10px;background:#fff}
+    .lang-dot{width:16px;height:16px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;background:linear-gradient(145deg,#18374d,#2f627f)}
+    .lang-select{border:0;background:transparent;font-size:12px;font-weight:700;color:var(--text);min-width:120px;outline:none;appearance:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
     .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px}
     h1{margin:0 0 14px;font-size:32px;letter-spacing:-.5px}h2{margin:0 0 8px;font-size:21px;letter-spacing:-.25px}p{line-height:1.56;color:#33495f;margin:0 0 10px}
     @media (max-width:880px){.grid{grid-template-columns:1fr}}
@@ -40,32 +44,108 @@
     <header class="top">
       <img class="logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
       <nav class="nav">
-        <a class="btn" href="index.html">Calculator</a>
-        <a class="btn" href="tracker.html">Tracker</a>
-        <a class="btn" href="about.html">About</a>
+        <div class="lang-switch">
+          <span class="lang-dot" aria-hidden="true">◉</span>
+          <label class="sr-only" for="langSelect">Language</label>
+          <select id="langSelect" class="lang-select" aria-label="Language">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="no">Norsk</option>
+            <option value="sv">Svenska</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <a class="btn" id="navCalc" href="index.html">Calculator</a>
+        <a class="btn" id="navTracker" href="tracker.html">Tracker</a>
+        <a class="btn" id="navAbout" href="about.html">About</a>
       </nav>
     </header>
 
-    <h1>Information</h1>
+    <h1 id="infoTitle">Information</h1>
     <section class="grid">
       <article class="card">
-        <h2>Terms and Conditions</h2>
-        <p>CommutingValue provides informational estimates for commute time and financial burden. Results are approximations and not financial, tax, legal, or employment advice.</p>
-        <a class="btn" href="terms.html">Open Terms</a>
+        <h2 id="termsTitle">Terms and Conditions</h2>
+        <p id="termsText">CommutingValue provides informational estimates for commute time and financial burden. Results are approximations and not financial, tax, legal, or employment advice.</p>
+        <a class="btn" id="termsBtn" href="terms.html">Open Terms</a>
       </article>
 
       <article class="card">
-        <h2>Privacy</h2>
-        <p>Calculator and trip data are stored in your browser <code>sessionStorage</code> by default and are not sent to a backend by this static site.</p>
-        <a class="btn" href="privacy.html">Open Privacy</a>
+        <h2 id="privacyTitle">Privacy</h2>
+        <p id="privacyText">Calculator and trip data are stored in your browser <code>sessionStorage</code> by default and are not sent to a backend by this static site.</p>
+        <a class="btn" id="privacyBtn" href="privacy.html">Open Privacy</a>
       </article>
 
       <article class="card">
-        <h2>About</h2>
-        <p>CommutingValue encourages conscious decisions about how commuting time and money are used over the long run.</p>
-        <a class="btn" href="about.html">Open About</a>
+        <h2 id="aboutTitle">About</h2>
+        <p id="aboutText">CommutingValue encourages conscious decisions about how commuting time and money are used over the long run.</p>
+        <a class="btn" id="aboutBtn" href="about.html">Open About</a>
       </article>
     </section>
   </main>
+  <script>
+    const I18N = {
+      en: {
+        pageTitle: "CommutingValue Information",
+        navCalc: "Calculator", navTracker: "Tracker", navAbout: "About", infoTitle: "Information",
+        termsTitle: "Terms and Conditions", termsText: "CommutingValue provides informational estimates for commute time and financial burden. Results are approximations and not financial, tax, legal, or employment advice.", termsBtn: "Open Terms",
+        privacyTitle: "Privacy", privacyText: "Calculator and trip data are stored in your browser <code>sessionStorage</code> by default and are not sent to a backend by this static site.", privacyBtn: "Open Privacy",
+        aboutTitle: "About", aboutText: "CommutingValue encourages conscious decisions about how commuting time and money are used over the long run.", aboutBtn: "Open About"
+      },
+      es: {
+        pageTitle: "CommutingValue Información",
+        navCalc: "Calculadora", navTracker: "Rastreador", navAbout: "Acerca de", infoTitle: "Información",
+        termsTitle: "Términos y condiciones", termsText: "CommutingValue ofrece estimaciones informativas sobre tiempo de desplazamiento y carga financiera. Los resultados son aproximados y no constituyen asesoramiento financiero, fiscal, legal o laboral.", termsBtn: "Abrir términos",
+        privacyTitle: "Privacidad", privacyText: "Los datos de calculadora y viajes se almacenan por defecto en <code>sessionStorage</code> del navegador y no se envían a un backend por este sitio estático.", privacyBtn: "Abrir privacidad",
+        aboutTitle: "Acerca de", aboutText: "CommutingValue fomenta decisiones conscientes sobre cómo se usa el tiempo y dinero de desplazamiento a largo plazo.", aboutBtn: "Abrir acerca de"
+      },
+      zh: {
+        pageTitle: "CommutingValue 信息",
+        navCalc: "计算器", navTracker: "追踪器", navAbout: "关于", infoTitle: "信息",
+        termsTitle: "条款与条件", termsText: "CommutingValue 提供关于通勤时间和经济负担的信息性估算。结果仅为近似值，不构成财务、税务、法律或雇佣建议。", termsBtn: "打开条款",
+        privacyTitle: "隐私", privacyText: "计算器和行程数据默认保存在浏览器 <code>sessionStorage</code> 中，本静态网站不会发送到后端。", privacyBtn: "打开隐私",
+        aboutTitle: "关于", aboutText: "CommutingValue 鼓励人们长期、理性地看待通勤时间和金钱的使用。", aboutBtn: "打开关于"
+      },
+      no: {
+        pageTitle: "CommutingValue Informasjon",
+        navCalc: "Kalkulator", navTracker: "Tracker", navAbout: "Om", infoTitle: "Informasjon",
+        termsTitle: "Vilkår", termsText: "CommutingValue gir informative estimater av pendletid og økonomisk belastning. Resultatene er omtrentlige og er ikke finans-, skatte-, juridisk- eller arbeidsrådgivning.", termsBtn: "Åpne vilkår",
+        privacyTitle: "Personvern", privacyText: "Kalkulator- og turdata lagres som standard i nettleserens <code>sessionStorage</code> og sendes ikke til backend av dette statiske nettstedet.", privacyBtn: "Åpne personvern",
+        aboutTitle: "Om", aboutText: "CommutingValue oppmuntrer til bevisste valg om hvordan pendlingsrelatert tid og penger brukes over tid.", aboutBtn: "Åpne om"
+      },
+      sv: {
+        pageTitle: "CommutingValue Information",
+        navCalc: "Kalkylator", navTracker: "Tracker", navAbout: "Om", infoTitle: "Information",
+        termsTitle: "Villkor", termsText: "CommutingValue ger informativa uppskattningar av pendlingstid och ekonomisk belastning. Resultaten är ungefärliga och är inte finansiell, skatte-, juridisk eller arbetsrättslig rådgivning.", termsBtn: "Öppna villkor",
+        privacyTitle: "Integritet", privacyText: "Kalkylator- och resedata lagras som standard i webbläsarens <code>sessionStorage</code> och skickas inte till någon backend av den här statiska sidan.", privacyBtn: "Öppna integritet",
+        aboutTitle: "Om", aboutText: "CommutingValue uppmuntrar medvetna beslut om hur pendlingstid och pengar används över tid.", aboutBtn: "Öppna om"
+      },
+      de: {
+        pageTitle: "CommutingValue Informationen",
+        navCalc: "Rechner", navTracker: "Tracker", navAbout: "Über", infoTitle: "Informationen",
+        termsTitle: "Nutzungsbedingungen", termsText: "CommutingValue liefert informative Schätzungen zu Pendelzeit und finanzieller Belastung. Ergebnisse sind Näherungswerte und keine Finanz-, Steuer-, Rechts- oder Arbeitsberatung.", termsBtn: "Bedingungen öffnen",
+        privacyTitle: "Datenschutz", privacyText: "Rechner- und Fahrtdaten werden standardmäßig im Browser-<code>sessionStorage</code> gespeichert und von dieser statischen Seite nicht an ein Backend gesendet.", privacyBtn: "Datenschutz öffnen",
+        aboutTitle: "Über", aboutText: "CommutingValue fördert bewusste Entscheidungen darüber, wie Pendelzeit und -kosten langfristig genutzt werden.", aboutBtn: "Über öffnen"
+      }
+    };
+
+    function applyLanguage(lang) {
+      const current = I18N[lang] ? lang : "en";
+      localStorage.setItem("cv_lang", current);
+      document.documentElement.lang = current === "zh" ? "zh-CN" : current;
+      document.title = I18N[current].pageTitle;
+      document.getElementById("langSelect").value = current;
+      ["navCalc","navTracker","navAbout","infoTitle","termsTitle","termsBtn","privacyTitle","privacyBtn","aboutTitle","aboutBtn"].forEach((id) => {
+        document.getElementById(id).textContent = I18N[current][id];
+      });
+      document.getElementById("termsText").textContent = I18N[current].termsText;
+      document.getElementById("privacyText").innerHTML = I18N[current].privacyText;
+      document.getElementById("aboutText").textContent = I18N[current].aboutText;
+    }
+
+    const saved = localStorage.getItem("cv_lang") || "en";
+    applyLanguage(saved);
+    document.getElementById("langSelect").addEventListener("change", (e) => applyLanguage(e.target.value));
+  </script>
 </body>
 </html>

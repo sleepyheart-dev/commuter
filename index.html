@@ -90,7 +90,7 @@
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 14px;
       margin-bottom: 24px;
     }
@@ -116,7 +116,77 @@
       letter-spacing: 0.18px;
     }
 
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .topbar-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 22%);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+    }
+
+    .lang-globe {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #fff;
+      background: linear-gradient(150deg, color-mix(in srgb, var(--accent), #ffffff 10%), color-mix(in srgb, var(--accent-2), #ffffff 12%));
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 88%);
+    }
+
+    .lang-select {
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 0 14px 0 0;
+      min-width: 126px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @media (max-width: 920px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .topbar-right {
+        align-items: flex-start;
+        width: 100%;
+      }
+      .actions {
+        justify-content: flex-start;
+      }
+    }
 
     .btn {
       appearance: none;
@@ -448,22 +518,41 @@
     .hidden-print { display: block; }
 
     .tracker-card {
+      grid-column: 1 / -1;
       display: flex;
-      flex-direction: row;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      min-height: auto;
-      padding: 12px 14px;
+      margin-top: -4px;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 22%);
+      background: color-mix(in srgb, var(--panel-soft), #ffffff 16%);
+      box-shadow: 0 8px 18px rgba(34, 58, 83, 0.06);
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
     }
 
     .tracker-card .section-title {
-      margin: 0 0 2px;
+      margin: 0;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tracker-card .section-title h2 {
+      font-size: 15px;
+      letter-spacing: -0.12px;
+    }
+
+    .tracker-card .hint {
+      font-size: 11px;
     }
 
     .tracker-card .fine {
-      margin: 0;
-      max-width: 520px;
+      margin: 2px 0 0;
+      max-width: 620px;
+      font-size: 11px;
+      color: color-mix(in srgb, var(--muted), var(--text) 14%);
     }
 
     .tracker-actions {
@@ -472,9 +561,15 @@
       flex-wrap: wrap;
     }
 
+    .tracker-actions .btn {
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
     @media (max-width: 930px) {
       .grid { grid-template-columns: 1fr; }
       .tracker-card {
+        margin-top: 0;
         flex-direction: column;
         align-items: flex-start;
       }
@@ -521,49 +616,78 @@
     <header class="topbar hidden-print">
       <div class="brand" aria-label="CommutingValue">
         <img class="brand-logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
-        <div class="brand-sub">True cost of commuting, session-private</div>
+        <div class="brand-sub" id="brandSub">True cost of commuting, session-private</div>
       </div>
-      <div class="actions">
-        <a class="btn ghost" href="tracker.html">Manual tracker</a>
-        <button class="btn ghost" id="themeBtn" type="button">Theme</button>
-        <button class="btn danger" id="resetBtn" type="button">Reset session data</button>
+      <div class="topbar-right">
+        <div class="lang-switch">
+          <span class="lang-globe" aria-hidden="true">◉</span>
+          <label class="sr-only" for="langSelect">Language</label>
+          <select class="lang-select" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="no">Norsk</option>
+            <option value="sv">Svenska</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <div class="actions">
+          <a class="btn ghost" id="navTrackerBtn" href="tracker.html">Manual tracker</a>
+          <button class="btn ghost" id="themeBtn" type="button">Theme</button>
+          <button class="btn danger" id="resetBtn" type="button">Reset session data</button>
+        </div>
       </div>
     </header>
 
     <section class="hero">
-      <h1>See what your commute really costs in time, money, and life-hours.</h1>
-      <p>
+      <h1 id="heroTitle">See what your commute really costs in time, money, and life-hours.</h1>
+      <p id="heroText">
         Enter your daily commute time, distance, and cost assumptions.
         Get a clear weekly and annual report you can share.
         Data is stored in this browser session only.
       </p>
       <div class="hero-ctas hidden-print">
         <button class="btn primary" type="button" id="scrollToCalc">Run calculator</button>
-        <a class="btn" href="tracker.html">Open manual tracker</a>
+        <a class="btn" id="heroTrackerBtn" href="tracker.html">Open manual tracker</a>
         <button class="btn" type="button" id="demoBtn">Load demo values</button>
       </div>
       <div class="hero-pills">
-        <span class="pill">Session-only storage</span>
-        <span class="pill">No account</span>
-        <span class="pill">Distance helper links</span>
-        <span class="pill">PDF-ready report</span>
+        <span class="pill" id="pillSession">Session-only storage</span>
+        <span class="pill" id="pillNoAccount">No account</span>
+        <span class="pill" id="pillDistance">Distance helper links</span>
+        <span class="pill" id="pillPdf">PDF-ready report</span>
       </div>
     </section>
 
     <section class="grid">
       <article class="card" id="calc">
         <div class="section-title">
-          <h2>Commuting value calculator</h2>
-          <div class="hint">Session-only estimate</div>
+          <h2 id="calcTitle">Commuting value calculator</h2>
+          <div class="hint" id="calcHint">Session-only estimate</div>
         </div>
 
         <div class="row">
           <div>
-            <label for="wage">Hourly wage (pre-tax)</label>
-            <input id="wage" type="number" min="0" inputmode="decimal" placeholder="e.g., 42" />
+            <label id="labelWageMode" for="wageMode">Wage input mode</label>
+            <select id="wageMode">
+              <option value="hourly">Hourly pay</option>
+              <option value="monthly">Monthly salary</option>
+              <option value="yearly">Yearly salary</option>
+            </select>
           </div>
           <div>
-            <label for="currency">Currency</label>
+            <label id="labelWageAmount" for="wageAmount">Wage amount (pre-tax)</label>
+            <input id="wageAmount" type="number" min="0" inputmode="decimal" placeholder="e.g., 42" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label id="labelWorkHoursWeek" for="workHoursPerWeek">Work hours per week</label>
+            <input id="workHoursPerWeek" type="number" min="0" max="168" inputmode="decimal" placeholder="e.g., 37.5" />
+          </div>
+          <div>
+            <label id="labelCurrency" for="currency">Currency</label>
             <select id="currency">
               <option value="USD">USD</option>
               <option value="EUR">EUR</option>
@@ -574,24 +698,26 @@
           </div>
         </div>
 
+        <p class="fine" id="derivedHourlyHint">Calculated hourly wage: -</p>
+
         <div class="row">
           <div>
-            <label for="dailyCommuteMins">Daily commuting time (round-trip minutes)</label>
+            <label id="labelDailyMins" for="dailyCommuteMins">Daily commuting time (round-trip minutes)</label>
             <input id="dailyCommuteMins" type="number" min="0" inputmode="numeric" placeholder="e.g., 70" />
           </div>
           <div>
-            <label for="daysPerWeek">Workdays commuting per week</label>
+            <label id="labelDaysWeek" for="daysPerWeek">Workdays commuting per week</label>
             <input id="daysPerWeek" type="number" min="0" max="7" inputmode="numeric" placeholder="e.g., 4" />
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="distancePerDay">Daily commuting distance (round-trip km or miles)</label>
+            <label id="labelDistanceDay" for="distancePerDay">Daily commuting distance (round-trip km or miles)</label>
             <input id="distancePerDay" type="number" min="0" inputmode="decimal" placeholder="e.g., 32" />
           </div>
           <div>
-            <label for="distanceUnit">Distance unit</label>
+            <label id="labelDistanceUnit" for="distanceUnit">Distance unit</label>
             <select id="distanceUnit">
               <option value="km">Kilometers (km)</option>
               <option value="mi">Miles (mi)</option>
@@ -601,31 +727,31 @@
 
         <div class="row">
           <div>
-            <label for="costPerDistanceUnit">Direct transport cost per km/mi</label>
+            <label id="labelCostUnit" for="costPerDistanceUnit">Direct transport cost per km/mi</label>
             <input id="costPerDistanceUnit" type="number" min="0" inputmode="decimal" placeholder="fuel, wear, fare equivalent" />
           </div>
           <div>
-            <label for="fixedMonthlyCost">Fixed monthly transport cost</label>
+            <label id="labelFixedMonthly" for="fixedMonthlyCost">Fixed monthly transport cost</label>
             <input id="fixedMonthlyCost" type="number" min="0" inputmode="decimal" placeholder="pass, parking plan, insurance share" />
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="weeksPerYear">Weeks worked per year</label>
+            <label id="labelWeeksYear" for="weeksPerYear">Weeks worked per year</label>
             <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" placeholder="e.g., 46" />
           </div>
           <div>
-            <label for="transportMode">Primary transport mode (optional)</label>
+            <label id="labelTransportMode" for="transportMode">Primary transport mode (optional)</label>
             <select id="transportMode">
               <option value="">-</option>
-              <option>Walk</option>
-              <option>Bike</option>
-              <option>Bus</option>
-              <option>Train</option>
-              <option>Car</option>
-              <option>Mixed</option>
-              <option>Other</option>
+              <option value="walk">Walk</option>
+              <option value="bike">Bike</option>
+              <option value="bus">Bus</option>
+              <option value="train">Train</option>
+              <option value="car">Car</option>
+              <option value="mixed">Mixed</option>
+              <option value="other">Other</option>
             </select>
           </div>
         </div>
@@ -633,16 +759,16 @@
         <div class="divider hidden-print"></div>
 
         <div class="section-title hidden-print" style="margin-bottom:8px;">
-          <h2>Distance helper</h2>
-          <div class="hint">Opens map routes in a new tab</div>
+          <h2 id="distanceHelperTitle">Distance helper</h2>
+          <div class="hint" id="distanceHelperHint">Opens map routes in a new tab</div>
         </div>
         <div class="row hidden-print">
           <div>
-            <label for="origin">Origin</label>
+            <label id="labelOrigin" for="origin">Origin</label>
             <input id="origin" type="text" placeholder="Home address or area" />
           </div>
           <div>
-            <label for="destination">Destination</label>
+            <label id="labelDestination" for="destination">Destination</label>
             <input id="destination" type="text" placeholder="Work address or area" />
           </div>
         </div>
@@ -662,82 +788,82 @@
           <div class="muted" id="subResult"></div>
           <div class="kpi">
             <div class="tile">
-              <div class="label">Weekly commute time</div>
+              <div class="label" id="kpiWeeklyTime">Weekly commute time</div>
               <div class="value" id="weeklyHours"></div>
             </div>
             <div class="tile">
-              <div class="label">Annual commute time</div>
+              <div class="label" id="kpiAnnualTime">Annual commute time</div>
               <div class="value" id="annualHours"></div>
             </div>
             <div class="tile">
-              <div class="label">Annual distance</div>
+              <div class="label" id="kpiAnnualDistance">Annual distance</div>
               <div class="value" id="annualDistance"></div>
             </div>
           </div>
           <div class="kpi">
             <div class="tile">
-              <div class="label">Annual time value</div>
+              <div class="label" id="kpiAnnualTimeValue">Annual time value</div>
               <div class="value" id="annualTimeCost"></div>
             </div>
             <div class="tile">
-              <div class="label">Annual direct spend</div>
+              <div class="label" id="kpiAnnualDirect">Annual direct spend</div>
               <div class="value" id="annualDirectCost"></div>
             </div>
             <div class="tile">
-              <div class="label">Annual total burden</div>
+              <div class="label" id="kpiAnnualTotal">Annual total burden</div>
               <div class="value" id="annualTotal"></div>
             </div>
           </div>
         </div>
 
         <article class="report" id="reportCard" style="display:none;">
-          <h3>CommutingValue report</h3>
+          <h3 id="reportTitle">CommutingValue report</h3>
           <div class="fine" id="reportGeneratedAt"></div>
           <div class="divider"></div>
           <div id="reportBody" class="fine"></div>
         </article>
 
-        <p class="fine" style="margin-top:10px;">
+        <p class="fine" style="margin-top:10px;" id="privacyNote">
           Privacy note: calculator and trip data are saved in <code>sessionStorage</code> and are cleared when the browser session ends.
         </p>
       </article>
 
-      <article class="card tracker-card hidden-print">
+      <article class="tracker-card hidden-print">
         <div>
           <div class="section-title">
-            <h2>Manual trip tracker</h2>
-            <div class="hint">Optional</div>
+            <h2 id="trackerCardTitle">Manual tracker</h2>
+            <div class="hint" id="trackerCardHint">Optional</div>
           </div>
-          <p class="fine" style="font-size:12px;">
-            Track actual trips on a separate page with timer, weekly summary, and CSV export.
+          <p class="fine" style="font-size:12px;" id="trackerCardText">
+            Need precise logs? Use the separate timer tracker.
           </p>
         </div>
         <div class="tracker-actions">
-          <a class="btn" href="tracker.html">Open tracker</a>
+          <a class="btn ghost" id="trackerCardBtn" href="tracker.html">Open tracker</a>
         </div>
       </article>
     </section>
 
     <section class="support hidden-print">
       <div class="support-copy">
-        <div class="support-eyebrow">Support</div>
-        <p class="support-line">If this helped you make a clearer choice, consider supporting the tool.</p>
+        <div class="support-eyebrow" id="supportEyebrow">Support</div>
+        <p class="support-line" id="supportLine">If this helped you make a clearer choice, consider supporting the tool.</p>
       </div>
-      <a class="support-link" href="https://buymeacoffee.com/commuting_value" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>
+      <a class="support-link" id="supportLink" href="https://buymeacoffee.com/commuting_value" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>
     </section>
 
     <footer class="hidden-print">
       <div>
-        <div><strong>CommutingValue</strong> - transparent commuting cost estimates.</div>
-        <div class="fine">No signup. Session-only storage by default.</div>
+        <div id="footerLine"><strong>CommutingValue</strong> - transparent commuting cost estimates.</div>
+        <div class="fine" id="footerSub">No signup. Session-only storage by default.</div>
       </div>
       <div style="display:flex; gap:13px; flex-wrap:wrap;">
-        <a href="tracker.html">Tracker</a>
-        <a href="info.html">Info</a>
-        <a href="about.html">About</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms and Conditions</a>
-        <a href="#top">Back to top</a>
+        <a id="footerTracker" href="tracker.html">Tracker</a>
+        <a id="footerInfo" href="info.html">Info</a>
+        <a id="footerAbout" href="about.html">About</a>
+        <a id="footerPrivacy" href="privacy.html">Privacy</a>
+        <a id="footerTerms" href="terms.html">Terms and Conditions</a>
+        <a id="footerTop" href="#top">Back to top</a>
       </div>
     </footer>
   </main>
@@ -749,8 +875,843 @@
     const KEYS = {
       theme: "cv_theme",
       calc: "cv_calc",
-      trips: "cv_trips"
+      trips: "cv_trips",
+      lang: "cv_lang"
     };
+
+    const LOCALE_BY_LANG = {
+      en: "en-US",
+      es: "es-ES",
+      zh: "zh-CN",
+      no: "nb-NO",
+      sv: "sv-SE",
+      de: "de-DE"
+    };
+
+    const I18N = {
+      en: {
+        pageTitle: "CommutingValue - True Cost of Your Commute",
+        brandSub: "True cost of commuting, session-private",
+        navTrackerBtn: "Manual tracker",
+        themeBtn: "Theme",
+        resetBtn: "Reset session data",
+        heroTitle: "See what your commute really costs in time, money, and life-hours.",
+        heroText: "Enter your daily commute time, distance, and cost assumptions. Get a clear weekly and annual report you can share. Data is stored in this browser session only.",
+        scrollToCalc: "Run calculator",
+        heroTrackerBtn: "Open manual tracker",
+        demoBtn: "Load demo values",
+        pillSession: "Session-only storage",
+        pillNoAccount: "No account",
+        pillDistance: "Distance helper links",
+        pillPdf: "PDF-ready report",
+        calcTitle: "Commuting value calculator",
+        calcHint: "Session-only estimate",
+        labelWageMode: "Wage input mode",
+        labelWageAmount: "Wage amount (pre-tax)",
+        labelWorkHoursWeek: "Work hours per week",
+        wageModeHourly: "Hourly pay",
+        wageModeMonthly: "Monthly salary",
+        wageModeYearly: "Yearly salary",
+        labelCurrency: "Currency",
+        labelDailyMins: "Daily commuting time (round-trip minutes)",
+        labelDaysWeek: "Workdays commuting per week",
+        labelDistanceDay: "Daily commuting distance (round-trip km or miles)",
+        labelDistanceUnit: "Distance unit",
+        labelCostUnit: "Direct transport cost per km/mi",
+        labelFixedMonthly: "Fixed monthly transport cost",
+        labelWeeksYear: "Weeks worked per year",
+        labelTransportMode: "Primary transport mode (optional)",
+        distanceHelperTitle: "Distance helper",
+        distanceHelperHint: "Opens map routes in a new tab",
+        labelOrigin: "Origin",
+        labelDestination: "Destination",
+        openGoogleRoute: "Open Google Maps route",
+        openOSMRoute: "Open OpenStreetMap route",
+        calcBtn: "Calculate",
+        shareBtn: "Copy summary",
+        pdfBtn: "Export PDF report",
+        kpiWeeklyTime: "Weekly commute time",
+        kpiAnnualTime: "Annual commute time",
+        kpiAnnualDistance: "Annual distance",
+        kpiAnnualTimeValue: "Annual time value",
+        kpiAnnualDirect: "Annual direct spend",
+        kpiAnnualTotal: "Annual total burden",
+        reportTitle: "CommutingValue report",
+        privacyNote: "Privacy note: calculator and trip data are saved in <code>sessionStorage</code> and are cleared when the browser session ends.",
+        trackerCardTitle: "Manual tracker",
+        trackerCardHint: "Optional",
+        trackerCardText: "Need precise logs? Use the separate timer tracker.",
+        trackerCardBtn: "Open tracker",
+        supportEyebrow: "Support",
+        supportLine: "If this helped you make a clearer choice, consider supporting the tool.",
+        supportLink: "Buy Me a Coffee",
+        footerLine: "<strong>CommutingValue</strong> - transparent commuting cost estimates.",
+        footerSub: "No signup. Session-only storage by default.",
+        footerTracker: "Tracker",
+        footerInfo: "Info",
+        footerAbout: "About",
+        footerPrivacy: "Privacy",
+        footerTerms: "Terms and Conditions",
+        footerTop: "Back to top",
+        distanceKm: "Kilometers (km)",
+        distanceMi: "Miles (mi)",
+        modeWalk: "Walk",
+        modeBike: "Bike",
+        modeBus: "Bus",
+        modeTrain: "Train",
+        modeCar: "Car",
+        modeMixed: "Mixed",
+        modeOther: "Other",
+        phWageAmount: "e.g., 42",
+        phWorkHoursWeek: "e.g., 37.5",
+        phDailyMins: "e.g., 70",
+        phDaysWeek: "e.g., 4",
+        phDistanceDay: "e.g., 32",
+        phCostUnit: "fuel, wear, fare equivalent",
+        phFixedMonthly: "pass, parking plan, insurance share",
+        phWeeksYear: "e.g., 46",
+        phOrigin: "Home address or area",
+        phDestination: "Work address or area",
+        errWageAmount: "Wage amount must be greater than 0.",
+        errWorkHoursWeek: "Work hours per week must be 0-168.",
+        errWorkHoursNeeded: "Work hours per week must be greater than 0 for monthly/yearly salary.",
+        errDailyMins: "Daily commute minutes must be 0 or more.",
+        errDaysPerWeek: "Workdays per week must be 0-7.",
+        errDistanceDay: "Daily distance must be 0 or more.",
+        errCostUnit: "Cost per distance unit must be 0 or more.",
+        errFixedMonthly: "Fixed monthly cost must be 0 or more.",
+        errWeeksYear: "Weeks per year must be 0-52.",
+        alertFix: "Please fix:",
+        resultHeadline: "{hours} hours/week commuting",
+        resultSub: "Based on {mins} min/day, {days} days/week, {weeks} weeks/year.",
+        effectiveHourlyWageText: "Effective hourly wage used: {hourly}.",
+        reportGenerated: "Generated {time}",
+        reportSummaryTitle: "Summary",
+        reportHourlyWage: "Effective hourly wage",
+        reportWeeklyTime: "Weekly commute time",
+        reportAnnualTime: "Annual commute time",
+        reportAnnualDistance: "Annual commute distance",
+        reportAnnualTimeValue: "Annual time value",
+        reportAnnualDirect: "Annual direct spend",
+        reportAnnualTotal: "Annual total burden",
+        reportMonthlyAverage: "Monthly average burden",
+        alertFillFirst: "Fill calculator inputs first.",
+        shareText: "My commute costs about {annualTotal} per year ({weeklyHours} hours/week, {annualDistance} {distanceUnit}/year). Calculated with CommutingValue.",
+        alertSummaryCopied: "Summary copied.",
+        promptCopy: "Copy this:",
+        alertCalculateFirst: "Calculate first so the report has values.",
+        alertOriginDest: "Enter both origin and destination.",
+        confirmReset: "Clear all session data?",
+        alertCleared: "Session data cleared.",
+        derivedHourlyHint: "Calculated hourly wage: {hourly}",
+        derivedHourlyNeedInput: "Calculated hourly wage: enter wage amount.",
+        derivedHourlyNeedHours: "Calculated hourly wage: enter work hours/week for salary conversion."
+      },
+      es: {
+        pageTitle: "CommutingValue - Costo real de tu desplazamiento",
+        brandSub: "Costo real del trayecto, privado por sesión",
+        navTrackerBtn: "Rastreador manual",
+        themeBtn: "Tema",
+        resetBtn: "Restablecer datos de sesión",
+        heroTitle: "Descubre cuánto cuesta realmente tu desplazamiento en tiempo, dinero y horas de vida.",
+        heroText: "Introduce tu tiempo diario de viaje, distancia y supuestos de coste. Obtén un informe semanal y anual claro para compartir. Los datos se guardan solo en esta sesión del navegador.",
+        scrollToCalc: "Calcular ahora",
+        heroTrackerBtn: "Abrir rastreador manual",
+        demoBtn: "Cargar ejemplo",
+        pillSession: "Solo almacenamiento de sesión",
+        pillNoAccount: "Sin cuenta",
+        pillDistance: "Enlaces para distancia",
+        pillPdf: "Informe listo para PDF",
+        calcTitle: "Calculadora de valor del desplazamiento",
+        calcHint: "Estimación solo de sesión",
+        labelWageMode: "Modo de ingreso salarial",
+        labelWageAmount: "Importe salarial (antes de impuestos)",
+        labelWorkHoursWeek: "Horas de trabajo por semana",
+        wageModeHourly: "Pago por hora",
+        wageModeMonthly: "Salario mensual",
+        wageModeYearly: "Salario anual",
+        labelCurrency: "Moneda",
+        labelDailyMins: "Tiempo diario de desplazamiento (ida y vuelta en minutos)",
+        labelDaysWeek: "Días de trabajo con desplazamiento por semana",
+        labelDistanceDay: "Distancia diaria de desplazamiento (ida y vuelta en km o millas)",
+        labelDistanceUnit: "Unidad de distancia",
+        labelCostUnit: "Coste directo de transporte por km/mi",
+        labelFixedMonthly: "Coste fijo mensual de transporte",
+        labelWeeksYear: "Semanas trabajadas al año",
+        labelTransportMode: "Modo principal de transporte (opcional)",
+        distanceHelperTitle: "Asistente de distancia",
+        distanceHelperHint: "Abre rutas en un mapa en una nueva pestaña",
+        labelOrigin: "Origen",
+        labelDestination: "Destino",
+        openGoogleRoute: "Abrir ruta en Google Maps",
+        openOSMRoute: "Abrir ruta en OpenStreetMap",
+        calcBtn: "Calcular",
+        shareBtn: "Copiar resumen",
+        pdfBtn: "Exportar informe PDF",
+        kpiWeeklyTime: "Tiempo semanal de desplazamiento",
+        kpiAnnualTime: "Tiempo anual de desplazamiento",
+        kpiAnnualDistance: "Distancia anual",
+        kpiAnnualTimeValue: "Valor anual del tiempo",
+        kpiAnnualDirect: "Gasto directo anual",
+        kpiAnnualTotal: "Carga total anual",
+        reportTitle: "Informe de CommutingValue",
+        privacyNote: "Nota de privacidad: los datos de calculadora y trayectos se guardan en <code>sessionStorage</code> y se eliminan al finalizar la sesión del navegador.",
+        trackerCardTitle: "Rastreador manual",
+        trackerCardHint: "Opcional",
+        trackerCardText: "¿Quieres un registro más preciso? Usa el rastreador con temporizador.",
+        trackerCardBtn: "Abrir rastreador",
+        supportEyebrow: "Apoyar",
+        supportLine: "Si esto te ayudó a tomar una decisión más clara, considera apoyar la herramienta.",
+        supportLink: "Invítame a un café",
+        footerLine: "<strong>CommutingValue</strong> - estimaciones transparentes del costo de desplazamiento.",
+        footerSub: "Sin registro. Almacenamiento por sesión por defecto.",
+        footerTracker: "Rastreador",
+        footerInfo: "Información",
+        footerAbout: "Acerca de",
+        footerPrivacy: "Privacidad",
+        footerTerms: "Términos y condiciones",
+        footerTop: "Volver arriba",
+        distanceKm: "Kilómetros (km)",
+        distanceMi: "Millas (mi)",
+        modeWalk: "Caminar",
+        modeBike: "Bicicleta",
+        modeBus: "Autobús",
+        modeTrain: "Tren",
+        modeCar: "Coche",
+        modeMixed: "Mixto",
+        modeOther: "Otro",
+        phWageAmount: "p. ej., 42",
+        phWorkHoursWeek: "p. ej., 37.5",
+        phDailyMins: "p. ej., 70",
+        phDaysWeek: "p. ej., 4",
+        phDistanceDay: "p. ej., 32",
+        phCostUnit: "combustible, desgaste, tarifa",
+        phFixedMonthly: "abono, parking, seguro",
+        phWeeksYear: "p. ej., 46",
+        phOrigin: "Dirección o zona de casa",
+        phDestination: "Dirección o zona de trabajo",
+        errWageAmount: "El importe salarial debe ser mayor que 0.",
+        errWorkHoursWeek: "Las horas por semana deben estar entre 0 y 168.",
+        errWorkHoursNeeded: "Para salario mensual/anual, las horas de trabajo por semana deben ser mayores que 0.",
+        errDailyMins: "Los minutos diarios deben ser 0 o más.",
+        errDaysPerWeek: "Los días por semana deben estar entre 0 y 7.",
+        errDistanceDay: "La distancia diaria debe ser 0 o más.",
+        errCostUnit: "El coste por unidad debe ser 0 o más.",
+        errFixedMonthly: "El coste mensual fijo debe ser 0 o más.",
+        errWeeksYear: "Las semanas por año deben estar entre 0 y 52.",
+        alertFix: "Corrige lo siguiente:",
+        resultHeadline: "{hours} horas/semana de desplazamiento",
+        resultSub: "Basado en {mins} min/día, {days} días/semana, {weeks} semanas/año.",
+        effectiveHourlyWageText: "Salario por hora aplicado: {hourly}.",
+        reportGenerated: "Generado {time}",
+        reportSummaryTitle: "Resumen",
+        reportHourlyWage: "Salario por hora aplicado",
+        reportWeeklyTime: "Tiempo semanal de desplazamiento",
+        reportAnnualTime: "Tiempo anual de desplazamiento",
+        reportAnnualDistance: "Distancia anual de desplazamiento",
+        reportAnnualTimeValue: "Valor anual del tiempo",
+        reportAnnualDirect: "Gasto directo anual",
+        reportAnnualTotal: "Carga total anual",
+        reportMonthlyAverage: "Carga media mensual",
+        alertFillFirst: "Primero completa la calculadora.",
+        shareText: "Mi desplazamiento cuesta aprox. {annualTotal} al año ({weeklyHours} horas/semana, {annualDistance} {distanceUnit}/año). Calculado con CommutingValue.",
+        alertSummaryCopied: "Resumen copiado.",
+        promptCopy: "Copia esto:",
+        alertCalculateFirst: "Calcula primero para generar el informe.",
+        alertOriginDest: "Introduce origen y destino.",
+        confirmReset: "¿Borrar todos los datos de la sesión?",
+        alertCleared: "Datos de sesión borrados.",
+        derivedHourlyHint: "Salario por hora calculado: {hourly}",
+        derivedHourlyNeedInput: "Salario por hora calculado: introduce el importe salarial.",
+        derivedHourlyNeedHours: "Salario por hora calculado: introduce horas/semana para convertir salario."
+      },
+      zh: {
+        pageTitle: "CommutingValue - 通勤真实成本计算器",
+        brandSub: "通勤真实成本，数据仅限本次会话",
+        navTrackerBtn: "手动追踪器",
+        themeBtn: "主题",
+        resetBtn: "重置会话数据",
+        heroTitle: "看清你的通勤在时间、金钱与生命小时上的真实成本。",
+        heroText: "输入每日通勤时间、距离和成本假设，立即得到可分享的周报与年报。数据仅保存在当前浏览器会话中。",
+        scrollToCalc: "开始计算",
+        heroTrackerBtn: "打开手动追踪器",
+        demoBtn: "加载示例",
+        pillSession: "仅会话存储",
+        pillNoAccount: "无需账号",
+        pillDistance: "距离辅助链接",
+        pillPdf: "支持 PDF 导出",
+        calcTitle: "通勤价值计算器",
+        calcHint: "仅会话估算",
+        labelWageMode: "工资输入方式",
+        labelWageAmount: "工资金额（税前）",
+        labelWorkHoursWeek: "每周工作小时",
+        wageModeHourly: "时薪",
+        wageModeMonthly: "月薪",
+        wageModeYearly: "年薪",
+        labelCurrency: "货币",
+        labelDailyMins: "每日通勤时间（往返分钟）",
+        labelDaysWeek: "每周通勤工作日",
+        labelDistanceDay: "每日通勤距离（往返 km 或 mi）",
+        labelDistanceUnit: "距离单位",
+        labelCostUnit: "每公里/英里直接交通成本",
+        labelFixedMonthly: "每月固定交通成本",
+        labelWeeksYear: "每年工作周数",
+        labelTransportMode: "主要通勤方式（可选）",
+        distanceHelperTitle: "距离助手",
+        distanceHelperHint: "在新标签页打开地图路线",
+        labelOrigin: "起点",
+        labelDestination: "终点",
+        openGoogleRoute: "打开 Google Maps 路线",
+        openOSMRoute: "打开 OpenStreetMap 路线",
+        calcBtn: "计算",
+        shareBtn: "复制摘要",
+        pdfBtn: "导出 PDF 报告",
+        kpiWeeklyTime: "每周通勤时间",
+        kpiAnnualTime: "每年通勤时间",
+        kpiAnnualDistance: "每年距离",
+        kpiAnnualTimeValue: "每年时间价值",
+        kpiAnnualDirect: "每年直接支出",
+        kpiAnnualTotal: "每年总负担",
+        reportTitle: "CommutingValue 报告",
+        privacyNote: "隐私说明：计算器和行程数据默认保存在 <code>sessionStorage</code>，浏览器会话结束后会清除。",
+        trackerCardTitle: "手动追踪器",
+        trackerCardHint: "可选",
+        trackerCardText: "想要更精确的记录？请使用独立计时追踪器。",
+        trackerCardBtn: "打开追踪器",
+        supportEyebrow: "支持",
+        supportLine: "如果这个工具帮助你做出更清晰的选择，欢迎支持它。",
+        supportLink: "请我喝咖啡",
+        footerLine: "<strong>CommutingValue</strong> - 透明的通勤成本估算。",
+        footerSub: "无需注册。默认仅会话存储。",
+        footerTracker: "追踪器",
+        footerInfo: "信息",
+        footerAbout: "关于",
+        footerPrivacy: "隐私",
+        footerTerms: "条款",
+        footerTop: "返回顶部",
+        distanceKm: "公里 (km)",
+        distanceMi: "英里 (mi)",
+        modeWalk: "步行",
+        modeBike: "骑行",
+        modeBus: "公交",
+        modeTrain: "火车",
+        modeCar: "汽车",
+        modeMixed: "混合",
+        modeOther: "其他",
+        phWageAmount: "例如 42",
+        phWorkHoursWeek: "例如 37.5",
+        phDailyMins: "例如 70",
+        phDaysWeek: "例如 4",
+        phDistanceDay: "例如 32",
+        phCostUnit: "燃油、磨损、票价等",
+        phFixedMonthly: "月票、停车、保险分摊",
+        phWeeksYear: "例如 46",
+        phOrigin: "家庭地址或区域",
+        phDestination: "工作地址或区域",
+        errWageAmount: "工资金额必须大于 0。",
+        errWorkHoursWeek: "每周工作小时必须在 0-168 之间。",
+        errWorkHoursNeeded: "若使用月薪/年薪，请填写大于 0 的每周工作小时。",
+        errDailyMins: "每日通勤分钟数必须大于等于 0。",
+        errDaysPerWeek: "每周工作日必须在 0-7 之间。",
+        errDistanceDay: "每日距离必须大于等于 0。",
+        errCostUnit: "每单位距离成本必须大于等于 0。",
+        errFixedMonthly: "每月固定成本必须大于等于 0。",
+        errWeeksYear: "每年工作周数必须在 0-52 之间。",
+        alertFix: "请修正以下内容：",
+        resultHeadline: "每周通勤 {hours} 小时",
+        resultSub: "基于 {mins} 分钟/天、{days} 天/周、{weeks} 周/年。",
+        effectiveHourlyWageText: "采用的时薪：{hourly}。",
+        reportGenerated: "生成时间：{time}",
+        reportSummaryTitle: "摘要",
+        reportHourlyWage: "采用时薪",
+        reportWeeklyTime: "每周通勤时间",
+        reportAnnualTime: "每年通勤时间",
+        reportAnnualDistance: "每年通勤距离",
+        reportAnnualTimeValue: "每年时间价值",
+        reportAnnualDirect: "每年直接支出",
+        reportAnnualTotal: "每年总负担",
+        reportMonthlyAverage: "月平均负担",
+        alertFillFirst: "请先填写计算器输入项。",
+        shareText: "我的通勤每年大约花费 {annualTotal}（每周 {weeklyHours} 小时、每年 {annualDistance} {distanceUnit}）。由 CommutingValue 计算。",
+        alertSummaryCopied: "摘要已复制。",
+        promptCopy: "请复制：",
+        alertCalculateFirst: "请先计算再导出报告。",
+        alertOriginDest: "请填写起点和终点。",
+        confirmReset: "清除所有会话数据？",
+        alertCleared: "会话数据已清除。",
+        derivedHourlyHint: "计算时薪：{hourly}",
+        derivedHourlyNeedInput: "计算时薪：请输入工资金额。",
+        derivedHourlyNeedHours: "计算时薪：请输入每周工作小时以换算月薪/年薪。"
+      },
+      no: {
+        pageTitle: "CommutingValue - Den reelle kostnaden ved pendling",
+        brandSub: "Reell pendlekostnad, privat i denne økten",
+        navTrackerBtn: "Manuell tracker",
+        themeBtn: "Tema",
+        resetBtn: "Nullstill øktdata",
+        heroTitle: "Se hva pendlingen din faktisk koster i tid, penger og livstimer.",
+        heroText: "Legg inn daglig pendletid, avstand og kostnadsantakelser. Få en tydelig ukes- og årsrapport du kan dele. Data lagres kun i denne nettleserøkten.",
+        scrollToCalc: "Kjør kalkulator",
+        heroTrackerBtn: "Åpne manuell tracker",
+        demoBtn: "Last inn demo",
+        pillSession: "Kun øktlagring",
+        pillNoAccount: "Ingen konto",
+        pillDistance: "Lenker for avstandshjelp",
+        pillPdf: "PDF-klar rapport",
+        calcTitle: "Pendleverdi-kalkulator",
+        calcHint: "Kun øktestimat",
+        labelWageMode: "Lønnsmodus",
+        labelWageAmount: "Lønnsbeløp (før skatt)",
+        labelWorkHoursWeek: "Arbeidstimer per uke",
+        wageModeHourly: "Timelønn",
+        wageModeMonthly: "Månedslønn",
+        wageModeYearly: "Årslønn",
+        labelCurrency: "Valuta",
+        labelDailyMins: "Daglig pendletid (tur/retur i minutter)",
+        labelDaysWeek: "Arbeidsdager med pendling per uke",
+        labelDistanceDay: "Daglig pendleavstand (tur/retur km eller miles)",
+        labelDistanceUnit: "Avstandsenhet",
+        labelCostUnit: "Direkte transportkostnad per km/mi",
+        labelFixedMonthly: "Fast månedlig transportkostnad",
+        labelWeeksYear: "Arbeidsuker per år",
+        labelTransportMode: "Primær transportmåte (valgfritt)",
+        distanceHelperTitle: "Avstandshjelper",
+        distanceHelperHint: "Åpner ruter i kart i ny fane",
+        labelOrigin: "Start",
+        labelDestination: "Mål",
+        openGoogleRoute: "Åpne Google Maps-rute",
+        openOSMRoute: "Åpne OpenStreetMap-rute",
+        calcBtn: "Beregn",
+        shareBtn: "Kopier oppsummering",
+        pdfBtn: "Eksporter PDF-rapport",
+        kpiWeeklyTime: "Ukentlig pendletid",
+        kpiAnnualTime: "Årlig pendletid",
+        kpiAnnualDistance: "Årlig avstand",
+        kpiAnnualTimeValue: "Årlig tidsverdi",
+        kpiAnnualDirect: "Årlige direkte kostnader",
+        kpiAnnualTotal: "Årlig totalbelastning",
+        reportTitle: "CommutingValue-rapport",
+        privacyNote: "Personvern: kalkulator- og turdata lagres i <code>sessionStorage</code> og slettes når nettleserøkten avsluttes.",
+        trackerCardTitle: "Manuell tracker",
+        trackerCardHint: "Valgfritt",
+        trackerCardText: "Vil du ha mer presise logger? Bruk den separate timetracker-siden.",
+        trackerCardBtn: "Åpne tracker",
+        supportEyebrow: "Støtte",
+        supportLine: "Hvis dette hjalp deg til et klarere valg, vurder å støtte verktøyet.",
+        supportLink: "Buy Me a Coffee",
+        footerLine: "<strong>CommutingValue</strong> - transparente estimater av pendlekostnader.",
+        footerSub: "Ingen innlogging. Kun øktlagring som standard.",
+        footerTracker: "Tracker",
+        footerInfo: "Info",
+        footerAbout: "Om",
+        footerPrivacy: "Personvern",
+        footerTerms: "Vilkår",
+        footerTop: "Til toppen",
+        distanceKm: "Kilometer (km)",
+        distanceMi: "Miles (mi)",
+        modeWalk: "Gå",
+        modeBike: "Sykkel",
+        modeBus: "Buss",
+        modeTrain: "Tog",
+        modeCar: "Bil",
+        modeMixed: "Kombinert",
+        modeOther: "Annet",
+        phWageAmount: "f.eks. 42",
+        phWorkHoursWeek: "f.eks. 37.5",
+        phDailyMins: "f.eks. 70",
+        phDaysWeek: "f.eks. 4",
+        phDistanceDay: "f.eks. 32",
+        phCostUnit: "drivstoff, slitasje, billett",
+        phFixedMonthly: "periodekort, parkering, forsikring",
+        phWeeksYear: "f.eks. 46",
+        phOrigin: "Hjemadresse eller område",
+        phDestination: "Jobbadresse eller område",
+        errWageAmount: "Lønnsbeløp må være større enn 0.",
+        errWorkHoursWeek: "Arbeidstimer per uke må være 0-168.",
+        errWorkHoursNeeded: "For måneds-/årslønn må arbeidstimer per uke være større enn 0.",
+        errDailyMins: "Daglige pendlingsminutter må være 0 eller mer.",
+        errDaysPerWeek: "Arbeidsdager per uke må være 0-7.",
+        errDistanceDay: "Daglig avstand må være 0 eller mer.",
+        errCostUnit: "Kostnad per enhet må være 0 eller mer.",
+        errFixedMonthly: "Fast månedskostnad må være 0 eller mer.",
+        errWeeksYear: "Uker per år må være 0-52.",
+        alertFix: "Rett opp følgende:",
+        resultHeadline: "{hours} timer/uke pendling",
+        resultSub: "Basert på {mins} min/dag, {days} dager/uke, {weeks} uker/år.",
+        effectiveHourlyWageText: "Effektiv timelønn brukt: {hourly}.",
+        reportGenerated: "Generert {time}",
+        reportSummaryTitle: "Oppsummering",
+        reportHourlyWage: "Effektiv timelønn",
+        reportWeeklyTime: "Ukentlig pendletid",
+        reportAnnualTime: "Årlig pendletid",
+        reportAnnualDistance: "Årlig pendleavstand",
+        reportAnnualTimeValue: "Årlig tidsverdi",
+        reportAnnualDirect: "Årlige direkte kostnader",
+        reportAnnualTotal: "Årlig totalbelastning",
+        reportMonthlyAverage: "Månedlig snittbelastning",
+        alertFillFirst: "Fyll ut kalkulatoren først.",
+        shareText: "Pendlingen min koster omtrent {annualTotal} per år ({weeklyHours} timer/uke, {annualDistance} {distanceUnit}/år). Beregnet med CommutingValue.",
+        alertSummaryCopied: "Oppsummering kopiert.",
+        promptCopy: "Kopier dette:",
+        alertCalculateFirst: "Beregn først så rapporten får verdier.",
+        alertOriginDest: "Legg inn både start og mål.",
+        confirmReset: "Slette alle øktdata?",
+        alertCleared: "Øktdata slettet.",
+        derivedHourlyHint: "Beregnet timelønn: {hourly}",
+        derivedHourlyNeedInput: "Beregnet timelønn: legg inn lønnsbeløp.",
+        derivedHourlyNeedHours: "Beregnet timelønn: legg inn arbeidstimer/uke for lønnskonvertering."
+      },
+      sv: {
+        pageTitle: "CommutingValue - Den verkliga kostnaden för pendling",
+        brandSub: "Verklig pendlingskostnad, privat i sessionen",
+        navTrackerBtn: "Manuell tracker",
+        themeBtn: "Tema",
+        resetBtn: "Återställ sessionsdata",
+        heroTitle: "Se vad din pendling verkligen kostar i tid, pengar och livstimmar.",
+        heroText: "Ange daglig pendlingstid, avstånd och kostnadsantaganden. Få en tydlig vecko- och årsrapport som du kan dela. Data sparas endast i den här webbläsarsessionen.",
+        scrollToCalc: "Kör kalkylatorn",
+        heroTrackerBtn: "Öppna manuell tracker",
+        demoBtn: "Ladda demo",
+        pillSession: "Endast sessionslagring",
+        pillNoAccount: "Inget konto",
+        pillDistance: "Länkar för avståndshjälp",
+        pillPdf: "PDF-klar rapport",
+        calcTitle: "Pendlingsvärde-kalkylator",
+        calcHint: "Endast sessionsestimat",
+        labelWageMode: "Löneläge",
+        labelWageAmount: "Lönebelopp (före skatt)",
+        labelWorkHoursWeek: "Arbetstimmar per vecka",
+        wageModeHourly: "Timlön",
+        wageModeMonthly: "Månadslön",
+        wageModeYearly: "Årslön",
+        labelCurrency: "Valuta",
+        labelDailyMins: "Daglig pendlingstid (tur och retur i minuter)",
+        labelDaysWeek: "Arbetsdagar med pendling per vecka",
+        labelDistanceDay: "Dagligt pendlingsavstånd (tur och retur km eller miles)",
+        labelDistanceUnit: "Avståndsenhet",
+        labelCostUnit: "Direkt transportkostnad per km/mi",
+        labelFixedMonthly: "Fast månatlig transportkostnad",
+        labelWeeksYear: "Arbetsveckor per år",
+        labelTransportMode: "Primärt transportmedel (valfritt)",
+        distanceHelperTitle: "Avståndshjälp",
+        distanceHelperHint: "Öppnar rutter i ny flik",
+        labelOrigin: "Start",
+        labelDestination: "Mål",
+        openGoogleRoute: "Öppna Google Maps-rutt",
+        openOSMRoute: "Öppna OpenStreetMap-rutt",
+        calcBtn: "Beräkna",
+        shareBtn: "Kopiera sammanfattning",
+        pdfBtn: "Exportera PDF-rapport",
+        kpiWeeklyTime: "Veckovis pendlingstid",
+        kpiAnnualTime: "Årlig pendlingstid",
+        kpiAnnualDistance: "Årligt avstånd",
+        kpiAnnualTimeValue: "Årligt tidsvärde",
+        kpiAnnualDirect: "Årlig direkt kostnad",
+        kpiAnnualTotal: "Årlig total belastning",
+        reportTitle: "CommutingValue-rapport",
+        privacyNote: "Integritetsnotis: kalkylator- och resedata lagras i <code>sessionStorage</code> och rensas när webbläsarsessionen avslutas.",
+        trackerCardTitle: "Manuell tracker",
+        trackerCardHint: "Valfritt",
+        trackerCardText: "Vill du ha mer precisa loggar? Använd den separata timer-trackern.",
+        trackerCardBtn: "Öppna tracker",
+        supportEyebrow: "Stöd",
+        supportLine: "Om detta hjälpte dig att fatta ett tydligare beslut, överväg att stödja verktyget.",
+        supportLink: "Buy Me a Coffee",
+        footerLine: "<strong>CommutingValue</strong> - transparenta uppskattningar av pendlingskostnad.",
+        footerSub: "Ingen inloggning. Endast sessionslagring som standard.",
+        footerTracker: "Tracker",
+        footerInfo: "Info",
+        footerAbout: "Om",
+        footerPrivacy: "Integritet",
+        footerTerms: "Villkor",
+        footerTop: "Till toppen",
+        distanceKm: "Kilometer (km)",
+        distanceMi: "Miles (mi)",
+        modeWalk: "Gång",
+        modeBike: "Cykel",
+        modeBus: "Buss",
+        modeTrain: "Tåg",
+        modeCar: "Bil",
+        modeMixed: "Blandat",
+        modeOther: "Annat",
+        phWageAmount: "t.ex. 42",
+        phWorkHoursWeek: "t.ex. 37.5",
+        phDailyMins: "t.ex. 70",
+        phDaysWeek: "t.ex. 4",
+        phDistanceDay: "t.ex. 32",
+        phCostUnit: "bränsle, slitage, biljett",
+        phFixedMonthly: "kort, parkering, försäkring",
+        phWeeksYear: "t.ex. 46",
+        phOrigin: "Hemadress eller område",
+        phDestination: "Arbetsadress eller område",
+        errWageAmount: "Lönebeloppet måste vara större än 0.",
+        errWorkHoursWeek: "Arbetstimmar per vecka måste vara 0-168.",
+        errWorkHoursNeeded: "För månads-/årslön måste arbetstimmar per vecka vara större än 0.",
+        errDailyMins: "Dagliga minuter måste vara 0 eller mer.",
+        errDaysPerWeek: "Arbetsdagar per vecka måste vara 0-7.",
+        errDistanceDay: "Dagligt avstånd måste vara 0 eller mer.",
+        errCostUnit: "Kostnad per enhet måste vara 0 eller mer.",
+        errFixedMonthly: "Fast månadskostnad måste vara 0 eller mer.",
+        errWeeksYear: "Veckor per år måste vara 0-52.",
+        alertFix: "Åtgärda följande:",
+        resultHeadline: "{hours} timmar/vecka pendling",
+        resultSub: "Baserat på {mins} min/dag, {days} dagar/vecka, {weeks} veckor/år.",
+        effectiveHourlyWageText: "Använd beräknad timlön: {hourly}.",
+        reportGenerated: "Genererad {time}",
+        reportSummaryTitle: "Sammanfattning",
+        reportHourlyWage: "Beräknad timlön",
+        reportWeeklyTime: "Veckovis pendlingstid",
+        reportAnnualTime: "Årlig pendlingstid",
+        reportAnnualDistance: "Årligt pendlingsavstånd",
+        reportAnnualTimeValue: "Årligt tidsvärde",
+        reportAnnualDirect: "Årlig direkt kostnad",
+        reportAnnualTotal: "Årlig total belastning",
+        reportMonthlyAverage: "Månatlig snittbelastning",
+        alertFillFirst: "Fyll i kalkylatorn först.",
+        shareText: "Min pendling kostar cirka {annualTotal} per år ({weeklyHours} timmar/vecka, {annualDistance} {distanceUnit}/år). Beräknat med CommutingValue.",
+        alertSummaryCopied: "Sammanfattning kopierad.",
+        promptCopy: "Kopiera detta:",
+        alertCalculateFirst: "Beräkna först så att rapporten får värden.",
+        alertOriginDest: "Ange både start och mål.",
+        confirmReset: "Rensa all sessionsdata?",
+        alertCleared: "Sessionsdata rensad.",
+        derivedHourlyHint: "Beräknad timlön: {hourly}",
+        derivedHourlyNeedInput: "Beräknad timlön: ange lönebelopp.",
+        derivedHourlyNeedHours: "Beräknad timlön: ange arbetstimmar/vecka för löneomräkning."
+      },
+      de: {
+        pageTitle: "CommutingValue - Die wahren Pendelkosten",
+        brandSub: "Wahre Pendelkosten, nur in dieser Sitzung gespeichert",
+        navTrackerBtn: "Manueller Tracker",
+        themeBtn: "Design",
+        resetBtn: "Sitzungsdaten zurücksetzen",
+        heroTitle: "Sieh, was dein Pendeln wirklich an Zeit, Geld und Lebensstunden kostet.",
+        heroText: "Gib tägliche Pendelzeit, Distanz und Kostenannahmen ein. Erhalte einen klaren Wochen- und Jahresbericht zum Teilen. Daten werden nur in dieser Browser-Sitzung gespeichert.",
+        scrollToCalc: "Rechner starten",
+        heroTrackerBtn: "Manuellen Tracker öffnen",
+        demoBtn: "Demo laden",
+        pillSession: "Nur Sitzungsdaten",
+        pillNoAccount: "Kein Konto",
+        pillDistance: "Distanz-Hilfe",
+        pillPdf: "PDF-fertiger Bericht",
+        calcTitle: "Pendelwert-Rechner",
+        calcHint: "Schätzung nur für diese Sitzung",
+        labelWageMode: "Lohnmodus",
+        labelWageAmount: "Lohnbetrag (vor Steuern)",
+        labelWorkHoursWeek: "Arbeitsstunden pro Woche",
+        wageModeHourly: "Stundenlohn",
+        wageModeMonthly: "Monatsgehalt",
+        wageModeYearly: "Jahresgehalt",
+        labelCurrency: "Währung",
+        labelDailyMins: "Tägliche Pendelzeit (Hin- und Rückweg in Minuten)",
+        labelDaysWeek: "Pendel-Arbeitstage pro Woche",
+        labelDistanceDay: "Tägliche Pendeldistanz (Hin- und Rückweg km oder mi)",
+        labelDistanceUnit: "Distanz-Einheit",
+        labelCostUnit: "Direkte Transportkosten pro km/mi",
+        labelFixedMonthly: "Fixe monatliche Transportkosten",
+        labelWeeksYear: "Arbeitswochen pro Jahr",
+        labelTransportMode: "Primäres Verkehrsmittel (optional)",
+        distanceHelperTitle: "Distanz-Helfer",
+        distanceHelperHint: "Öffnet Kartenrouten in neuem Tab",
+        labelOrigin: "Start",
+        labelDestination: "Ziel",
+        openGoogleRoute: "Google-Maps-Route öffnen",
+        openOSMRoute: "OpenStreetMap-Route öffnen",
+        calcBtn: "Berechnen",
+        shareBtn: "Zusammenfassung kopieren",
+        pdfBtn: "PDF-Bericht exportieren",
+        kpiWeeklyTime: "Wöchentliche Pendelzeit",
+        kpiAnnualTime: "Jährliche Pendelzeit",
+        kpiAnnualDistance: "Jährliche Distanz",
+        kpiAnnualTimeValue: "Jährlicher Zeitwert",
+        kpiAnnualDirect: "Jährliche direkte Ausgaben",
+        kpiAnnualTotal: "Jährliche Gesamtbelastung",
+        reportTitle: "CommutingValue-Bericht",
+        privacyNote: "Hinweis zum Datenschutz: Rechner- und Fahrtdaten werden in <code>sessionStorage</code> gespeichert und am Ende der Browser-Sitzung gelöscht.",
+        trackerCardTitle: "Manueller Tracker",
+        trackerCardHint: "Optional",
+        trackerCardText: "Für präzisere Logs nutze den separaten Timer-Tracker.",
+        trackerCardBtn: "Tracker öffnen",
+        supportEyebrow: "Unterstützung",
+        supportLine: "Wenn dir dieses Tool zu einer klareren Entscheidung geholfen hat, unterstütze es gern.",
+        supportLink: "Buy Me a Coffee",
+        footerLine: "<strong>CommutingValue</strong> - transparente Schätzungen der Pendelkosten.",
+        footerSub: "Keine Anmeldung. Standardmäßig nur Sitzungsdaten.",
+        footerTracker: "Tracker",
+        footerInfo: "Info",
+        footerAbout: "Über",
+        footerPrivacy: "Datenschutz",
+        footerTerms: "Nutzungsbedingungen",
+        footerTop: "Nach oben",
+        distanceKm: "Kilometer (km)",
+        distanceMi: "Meilen (mi)",
+        modeWalk: "Zu Fuß",
+        modeBike: "Fahrrad",
+        modeBus: "Bus",
+        modeTrain: "Zug",
+        modeCar: "Auto",
+        modeMixed: "Gemischt",
+        modeOther: "Sonstiges",
+        phWageAmount: "z. B. 42",
+        phWorkHoursWeek: "z. B. 37.5",
+        phDailyMins: "z. B. 70",
+        phDaysWeek: "z. B. 4",
+        phDistanceDay: "z. B. 32",
+        phCostUnit: "Kraftstoff, Verschleiß, Fahrpreis",
+        phFixedMonthly: "Abo, Parken, Versicherungsanteil",
+        phWeeksYear: "z. B. 46",
+        phOrigin: "Wohnadresse oder Gebiet",
+        phDestination: "Arbeitsadresse oder Gebiet",
+        errWageAmount: "Der Lohnbetrag muss größer als 0 sein.",
+        errWorkHoursWeek: "Arbeitsstunden pro Woche müssen zwischen 0 und 168 liegen.",
+        errWorkHoursNeeded: "Für Monats-/Jahresgehalt müssen Arbeitsstunden pro Woche größer als 0 sein.",
+        errDailyMins: "Tägliche Pendelminuten müssen 0 oder mehr sein.",
+        errDaysPerWeek: "Arbeitstage pro Woche müssen zwischen 0 und 7 liegen.",
+        errDistanceDay: "Die tägliche Distanz muss 0 oder mehr sein.",
+        errCostUnit: "Kosten pro Distanz-Einheit müssen 0 oder mehr sein.",
+        errFixedMonthly: "Fixe Monatskosten müssen 0 oder mehr sein.",
+        errWeeksYear: "Wochen pro Jahr müssen zwischen 0 und 52 liegen.",
+        alertFix: "Bitte korrigieren:",
+        resultHeadline: "{hours} Stunden/Woche Pendeln",
+        resultSub: "Basierend auf {mins} Min/Tag, {days} Tagen/Woche, {weeks} Wochen/Jahr.",
+        effectiveHourlyWageText: "Verwendeter effektiver Stundenlohn: {hourly}.",
+        reportGenerated: "Erstellt {time}",
+        reportSummaryTitle: "Zusammenfassung",
+        reportHourlyWage: "Effektiver Stundenlohn",
+        reportWeeklyTime: "Wöchentliche Pendelzeit",
+        reportAnnualTime: "Jährliche Pendelzeit",
+        reportAnnualDistance: "Jährliche Pendeldistanz",
+        reportAnnualTimeValue: "Jährlicher Zeitwert",
+        reportAnnualDirect: "Jährliche direkte Ausgaben",
+        reportAnnualTotal: "Jährliche Gesamtbelastung",
+        reportMonthlyAverage: "Monatliche Durchschnittsbelastung",
+        alertFillFirst: "Bitte zuerst die Rechnerfelder ausfüllen.",
+        shareText: "Mein Pendeln kostet etwa {annualTotal} pro Jahr ({weeklyHours} Stunden/Woche, {annualDistance} {distanceUnit}/Jahr). Berechnet mit CommutingValue.",
+        alertSummaryCopied: "Zusammenfassung kopiert.",
+        promptCopy: "Hier kopieren:",
+        alertCalculateFirst: "Bitte zuerst berechnen, damit der Bericht Werte enthält.",
+        alertOriginDest: "Bitte Start und Ziel eingeben.",
+        confirmReset: "Alle Sitzungsdaten löschen?",
+        alertCleared: "Sitzungsdaten gelöscht.",
+        derivedHourlyHint: "Berechneter Stundenlohn: {hourly}",
+        derivedHourlyNeedInput: "Berechneter Stundenlohn: bitte Lohnbetrag eingeben.",
+        derivedHourlyNeedHours: "Berechneter Stundenlohn: bitte Arbeitsstunden/Woche für Gehaltsumrechnung eingeben."
+      }
+    };
+
+    let currentLang = "en";
+
+    function t(key) {
+      return I18N[currentLang]?.[key] ?? I18N.en[key] ?? key;
+    }
+
+    function tmpl(key, vars = {}) {
+      let text = t(key);
+      for (const [name, value] of Object.entries(vars)) {
+        text = text.replaceAll(`{${name}}`, String(value));
+      }
+      return text;
+    }
+
+    function setText(id, key) {
+      const el = $(id);
+      if (el) el.textContent = t(key);
+    }
+
+    function setHTML(id, key) {
+      const el = $(id);
+      if (el) el.innerHTML = t(key);
+    }
+
+    function applyLanguage(lang) {
+      currentLang = I18N[lang] ? lang : "en";
+      localStorage.setItem(KEYS.lang, currentLang);
+      document.documentElement.lang = currentLang === "zh" ? "zh-CN" : currentLang;
+      document.title = t("pageTitle");
+      $("langSelect").value = currentLang;
+
+      [
+        "brandSub", "navTrackerBtn", "themeBtn", "resetBtn", "heroTitle", "heroText",
+        "scrollToCalc", "heroTrackerBtn", "demoBtn", "pillSession", "pillNoAccount", "pillDistance", "pillPdf",
+        "calcTitle", "calcHint", "labelWageMode", "labelWageAmount", "labelWorkHoursWeek", "labelCurrency", "labelDailyMins", "labelDaysWeek", "labelDistanceDay",
+        "labelDistanceUnit", "labelCostUnit", "labelFixedMonthly", "labelWeeksYear", "labelTransportMode",
+        "distanceHelperTitle", "distanceHelperHint", "labelOrigin", "labelDestination",
+        "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "pdfBtn",
+        "kpiWeeklyTime", "kpiAnnualTime", "kpiAnnualDistance", "kpiAnnualTimeValue", "kpiAnnualDirect", "kpiAnnualTotal",
+        "reportTitle", "trackerCardTitle", "trackerCardHint", "trackerCardText", "trackerCardBtn",
+        "supportEyebrow", "supportLine", "supportLink", "footerSub", "footerTracker", "footerInfo",
+        "footerAbout", "footerPrivacy", "footerTerms", "footerTop"
+      ].forEach((id) => setText(id, id));
+
+      setHTML("privacyNote", "privacyNote");
+      setHTML("footerLine", "footerLine");
+
+      const ph = {
+        wageAmount: "phWageAmount",
+        workHoursPerWeek: "phWorkHoursWeek",
+        dailyCommuteMins: "phDailyMins",
+        daysPerWeek: "phDaysWeek",
+        distancePerDay: "phDistanceDay",
+        costPerDistanceUnit: "phCostUnit",
+        fixedMonthlyCost: "phFixedMonthly",
+        weeksPerYear: "phWeeksYear",
+        origin: "phOrigin",
+        destination: "phDestination"
+      };
+      Object.entries(ph).forEach(([id, key]) => {
+        const el = $(id);
+        if (el) el.placeholder = t(key);
+      });
+
+      const distanceOptions = {
+        km: "distanceKm",
+        mi: "distanceMi"
+      };
+      Array.from($("distanceUnit").options).forEach((opt) => {
+        if (distanceOptions[opt.value]) opt.textContent = t(distanceOptions[opt.value]);
+      });
+
+      const wageModeKeys = {
+        hourly: "wageModeHourly",
+        monthly: "wageModeMonthly",
+        yearly: "wageModeYearly"
+      };
+      Array.from($("wageMode").options).forEach((opt) => {
+        if (wageModeKeys[opt.value]) opt.textContent = t(wageModeKeys[opt.value]);
+      });
+
+      const modeKeys = {
+        walk: "modeWalk",
+        bike: "modeBike",
+        bus: "modeBus",
+        train: "modeTrain",
+        car: "modeCar",
+        mixed: "modeMixed",
+        other: "modeOther"
+      };
+      Array.from($("transportMode").options).forEach((opt) => {
+        if (modeKeys[opt.value]) opt.textContent = t(modeKeys[opt.value]);
+      });
+
+      if ($("calcResults").style.display !== "none") {
+        const v = readCalcInputs();
+        const issues = validateInputs(v);
+        if (!issues.length) {
+          renderResults(v, compute(v));
+        }
+      }
+
+      updateDerivedWageHint();
+    }
+
+    function initLanguage() {
+      const saved = localStorage.getItem(KEYS.lang);
+      const lang = I18N[saved] ? saved : "en";
+      applyLanguage(lang);
+      $("langSelect").addEventListener("change", (event) => {
+        applyLanguage(event.target.value);
+      });
+    }
 
     function loadJSON(key, fallback) {
       try {
@@ -767,7 +1728,7 @@
 
     function formatMoney(amount, currency) {
       if (!Number.isFinite(amount)) return "-";
-      return new Intl.NumberFormat(undefined, {
+      return new Intl.NumberFormat(LOCALE_BY_LANG[currentLang] || undefined, {
         style: "currency",
         currency,
         maximumFractionDigits: 0
@@ -789,9 +1750,22 @@
       applyTheme(prefersDark ? "dark" : "light");
     }
 
+    function effectiveHourlyWage(v) {
+      if (!(v.wageAmount > 0)) return NaN;
+      if (v.wageMode === "hourly") return v.wageAmount;
+      if (!(v.workHoursPerWeek > 0)) return NaN;
+      const annualWorkHours = v.workHoursPerWeek * 52;
+      if (!(annualWorkHours > 0)) return NaN;
+      if (v.wageMode === "monthly") return (v.wageAmount * 12) / annualWorkHours;
+      if (v.wageMode === "yearly") return v.wageAmount / annualWorkHours;
+      return NaN;
+    }
+
     function readCalcInputs() {
-      return {
-        wage: Number($("wage").value),
+      const base = {
+        wageMode: $("wageMode").value,
+        wageAmount: Number($("wageAmount").value),
+        workHoursPerWeek: Number($("workHoursPerWeek").value),
         currency: $("currency").value,
         dailyCommuteMins: Number($("dailyCommuteMins").value),
         daysPerWeek: Number($("daysPerWeek").value),
@@ -802,26 +1776,51 @@
         weeksPerYear: Number($("weeksPerYear").value),
         transportMode: $("transportMode").value || null
       };
+      return {
+        ...base,
+        wage: effectiveHourlyWage(base)
+      };
+    }
+
+    function updateDerivedWageHint() {
+      const v = readCalcInputs();
+      if (!(v.wageAmount > 0)) {
+        $("derivedHourlyHint").textContent = t("derivedHourlyNeedInput");
+        return;
+      }
+      if (v.wageMode !== "hourly" && !(v.workHoursPerWeek > 0)) {
+        $("derivedHourlyHint").textContent = t("derivedHourlyNeedHours");
+        return;
+      }
+      const hourly = effectiveHourlyWage(v);
+      if (!Number.isFinite(hourly)) {
+        $("derivedHourlyHint").textContent = t("derivedHourlyNeedInput");
+        return;
+      }
+      $("derivedHourlyHint").textContent = tmpl("derivedHourlyHint", {
+        hourly: formatMoney(hourly, v.currency)
+      });
     }
 
     function validateInputs(v) {
       const issues = [];
-      if (!(v.wage > 0)) issues.push("Hourly wage must be greater than 0.");
-      if (!(v.dailyCommuteMins >= 0)) issues.push("Daily commute minutes must be 0 or more.");
-      if (!(v.daysPerWeek >= 0 && v.daysPerWeek <= 7)) issues.push("Workdays per week must be 0-7.");
-      if (!(v.distancePerDay >= 0)) issues.push("Daily distance must be 0 or more.");
-      if (!(v.costPerDistanceUnit >= 0)) issues.push("Cost per distance unit must be 0 or more.");
-      if (!(v.fixedMonthlyCost >= 0)) issues.push("Fixed monthly cost must be 0 or more.");
-      if (!(v.weeksPerYear >= 0 && v.weeksPerYear <= 52)) issues.push("Weeks per year must be 0-52.");
+      if (!(v.wageAmount > 0)) issues.push(t("errWageAmount"));
+      if (v.wageMode !== "hourly" && !(v.workHoursPerWeek >= 0 && v.workHoursPerWeek <= 168)) issues.push(t("errWorkHoursWeek"));
+      if (v.wageMode !== "hourly" && !(v.workHoursPerWeek > 0)) issues.push(t("errWorkHoursNeeded"));
+      if (v.wageMode === "hourly" && !(v.wage > 0)) issues.push(t("errWageAmount"));
+      if (!(v.dailyCommuteMins >= 0)) issues.push(t("errDailyMins"));
+      if (!(v.daysPerWeek >= 0 && v.daysPerWeek <= 7)) issues.push(t("errDaysPerWeek"));
+      if (!(v.distancePerDay >= 0)) issues.push(t("errDistanceDay"));
+      if (!(v.costPerDistanceUnit >= 0)) issues.push(t("errCostUnit"));
+      if (!(v.fixedMonthlyCost >= 0)) issues.push(t("errFixedMonthly"));
+      if (!(v.weeksPerYear >= 0 && v.weeksPerYear <= 52)) issues.push(t("errWeeksYear"));
       return issues;
     }
 
     function compute(v) {
       const weeklyHours = (v.dailyCommuteMins * v.daysPerWeek) / 60;
       const annualHours = weeklyHours * v.weeksPerYear;
-
       const annualDistance = v.distancePerDay * v.daysPerWeek * v.weeksPerYear;
-
       const annualTimeCost = annualHours * v.wage;
       const annualDistanceCost = annualDistance * v.costPerDistanceUnit;
       const annualFixedCost = v.fixedMonthlyCost * 12;
@@ -841,8 +1840,12 @@
 
     function renderResults(v, out) {
       $("calcResults").style.display = "block";
-      $("headlineResult").textContent = `${out.weeklyHours.toFixed(1)} hours/week commuting`;
-      $("subResult").textContent = `Based on ${v.dailyCommuteMins} min/day, ${v.daysPerWeek} days/week, ${v.weeksPerYear} weeks/year.`;
+      $("headlineResult").textContent = tmpl("resultHeadline", { hours: out.weeklyHours.toFixed(1) });
+      $("subResult").textContent = `${tmpl("resultSub", {
+        mins: v.dailyCommuteMins,
+        days: v.daysPerWeek,
+        weeks: v.weeksPerYear
+      })} ${tmpl("effectiveHourlyWageText", { hourly: formatMoney(v.wage, v.currency) })}`;
       $("weeklyHours").textContent = `${out.weeklyHours.toFixed(1)} h`;
       $("annualHours").textContent = `${out.annualHours.toFixed(0)} h`;
       $("annualDistance").textContent = `${out.annualDistance.toFixed(0)} ${v.distanceUnit}`;
@@ -854,16 +1857,19 @@
 
     function renderReport(v, out) {
       $("reportCard").style.display = "block";
-      $("reportGeneratedAt").textContent = `Generated ${new Date().toLocaleString()}`;
+      $("reportGeneratedAt").textContent = tmpl("reportGenerated", {
+        time: new Date().toLocaleString(LOCALE_BY_LANG[currentLang] || undefined)
+      });
       $("reportBody").innerHTML = `
-        <strong>Summary</strong><br>
-        Weekly commute time: <strong>${out.weeklyHours.toFixed(1)} hours</strong><br>
-        Annual commute time: <strong>${out.annualHours.toFixed(0)} hours</strong><br>
-        Annual commute distance: <strong>${out.annualDistance.toFixed(0)} ${v.distanceUnit}</strong><br><br>
-        Annual time value: <strong>${formatMoney(out.annualTimeCost, v.currency)}</strong><br>
-        Annual direct spend: <strong>${formatMoney(out.annualDirectCost, v.currency)}</strong><br>
-        Annual total burden: <strong>${formatMoney(out.annualTotal, v.currency)}</strong><br>
-        Monthly average burden: <strong>${formatMoney(out.monthlyTotal, v.currency)}</strong>
+        <strong>${t("reportSummaryTitle")}</strong><br>
+        ${t("reportHourlyWage")}: <strong>${formatMoney(v.wage, v.currency)}</strong><br>
+        ${t("reportWeeklyTime")}: <strong>${out.weeklyHours.toFixed(1)} h</strong><br>
+        ${t("reportAnnualTime")}: <strong>${out.annualHours.toFixed(0)} h</strong><br>
+        ${t("reportAnnualDistance")}: <strong>${out.annualDistance.toFixed(0)} ${v.distanceUnit}</strong><br><br>
+        ${t("reportAnnualTimeValue")}: <strong>${formatMoney(out.annualTimeCost, v.currency)}</strong><br>
+        ${t("reportAnnualDirect")}: <strong>${formatMoney(out.annualDirectCost, v.currency)}</strong><br>
+        ${t("reportAnnualTotal")}: <strong>${formatMoney(out.annualTotal, v.currency)}</strong><br>
+        ${t("reportMonthlyAverage")}: <strong>${formatMoney(out.monthlyTotal, v.currency)}</strong>
       `;
     }
 
@@ -874,7 +1880,22 @@
     function loadCalc() {
       const saved = loadJSON(KEYS.calc, null);
       if (!saved) return;
-      $("wage").value = saved.wage ?? "";
+      const modeMap = {
+        Walk: "walk",
+        Bike: "bike",
+        Bus: "bus",
+        Train: "train",
+        Car: "car",
+        Mixed: "mixed",
+        Other: "other"
+      };
+      $("wageMode").value = saved.wageMode ?? "hourly";
+      if (saved.wageAmount != null) {
+        $("wageAmount").value = saved.wageAmount;
+      } else {
+        $("wageAmount").value = saved.wage ?? "";
+      }
+      $("workHoursPerWeek").value = saved.workHoursPerWeek ?? "";
       $("currency").value = saved.currency ?? "USD";
       $("dailyCommuteMins").value = saved.dailyCommuteMins ?? "";
       $("daysPerWeek").value = saved.daysPerWeek ?? "";
@@ -883,15 +1904,22 @@
       $("costPerDistanceUnit").value = saved.costPerDistanceUnit ?? "";
       $("fixedMonthlyCost").value = saved.fixedMonthlyCost ?? "";
       $("weeksPerYear").value = saved.weeksPerYear ?? "";
-      $("transportMode").value = saved.transportMode ?? "";
+      const savedMode = saved.transportMode ?? "";
+      $("transportMode").value = modeMap[savedMode] || savedMode;
     }
 
     initTheme();
     loadCalc();
+    initLanguage();
 
     $("themeBtn").addEventListener("click", () => {
       const curr = document.documentElement.getAttribute("data-theme") || "light";
       applyTheme(curr === "dark" ? "light" : "dark");
+    });
+
+    ["wageMode", "wageAmount", "workHoursPerWeek", "currency"].forEach((id) => {
+      $(id).addEventListener("input", updateDerivedWageHint);
+      $(id).addEventListener("change", updateDerivedWageHint);
     });
 
     $("scrollToCalc").addEventListener("click", () => {
@@ -902,7 +1930,7 @@
       const v = readCalcInputs();
       const issues = validateInputs(v);
       if (issues.length) {
-        alert(`Please fix:\n\n${issues.join("\n")}`);
+        alert(`${t("alertFix")}\n\n${issues.join("\n")}`);
         return;
       }
       const out = compute(v);
@@ -914,16 +1942,21 @@
       const v = readCalcInputs();
       const issues = validateInputs(v);
       if (issues.length) {
-        alert("Fill calculator inputs first.");
+        alert(t("alertFillFirst"));
         return;
       }
       const out = compute(v);
-      const text = `My commute costs about ${formatMoney(out.annualTotal, v.currency)} per year (${out.weeklyHours.toFixed(1)} hours/week, ${out.annualDistance.toFixed(0)} ${v.distanceUnit}/year). Calculated with CommutingValue.`;
+      const text = tmpl("shareText", {
+        annualTotal: formatMoney(out.annualTotal, v.currency),
+        weeklyHours: out.weeklyHours.toFixed(1),
+        annualDistance: out.annualDistance.toFixed(0),
+        distanceUnit: v.distanceUnit
+      });
       try {
         await navigator.clipboard.writeText(text);
-        alert("Summary copied.");
+        alert(t("alertSummaryCopied"));
       } catch {
-        prompt("Copy this:", text);
+        prompt(t("promptCopy"), text);
       }
     });
 
@@ -931,7 +1964,7 @@
       const v = readCalcInputs();
       const issues = validateInputs(v);
       if (issues.length) {
-        alert("Calculate first so the report has values.");
+        alert(t("alertCalculateFirst"));
         return;
       }
       const out = compute(v);
@@ -943,7 +1976,7 @@
       const origin = $("origin").value.trim();
       const destination = $("destination").value.trim();
       if (!origin || !destination) {
-        alert("Enter both origin and destination.");
+        alert(t("alertOriginDest"));
         return;
       }
       const url = urlBuilder(origin, destination);
@@ -966,11 +1999,12 @@
     });
 
     $("resetBtn").addEventListener("click", () => {
-      if (!confirm("Clear all session data?")) return;
+      if (!confirm(t("confirmReset"))) return;
       STORE.removeItem(KEYS.calc);
       STORE.removeItem(KEYS.trips);
       [
-        "wage",
+        "wageAmount",
+        "workHoursPerWeek",
         "dailyCommuteMins",
         "daysPerWeek",
         "distancePerDay",
@@ -981,15 +2015,19 @@
         "origin",
         "destination"
       ].forEach((id) => { $(id).value = ""; });
+      $("wageMode").value = "hourly";
       $("currency").value = "USD";
       $("distanceUnit").value = "km";
       $("calcResults").style.display = "none";
       $("reportCard").style.display = "none";
-      alert("Session data cleared.");
+      updateDerivedWageHint();
+      alert(t("alertCleared"));
     });
 
     $("demoBtn").addEventListener("click", () => {
-      $("wage").value = "42";
+      $("wageMode").value = "hourly";
+      $("wageAmount").value = "42";
+      $("workHoursPerWeek").value = "37.5";
       $("currency").value = "USD";
       $("dailyCommuteMins").value = "70";
       $("daysPerWeek").value = "4";
@@ -998,10 +2036,10 @@
       $("costPerDistanceUnit").value = "0.38";
       $("fixedMonthlyCost").value = "120";
       $("weeksPerYear").value = "46";
-      $("transportMode").value = "Train";
+      $("transportMode").value = "train";
       $("origin").value = "Home";
       $("destination").value = "Office";
-
+      updateDerivedWageHint();
       $("calcBtn").click();
       $("calc").scrollIntoView({ behavior: "smooth" });
     });

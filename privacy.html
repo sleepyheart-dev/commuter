@@ -30,6 +30,10 @@
     .wrap{max-width:900px;margin:0 auto;padding:26px 16px 64px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
     .logo{width:220px;height:auto;display:block}.nav{display:flex;gap:8px;flex-wrap:wrap}
     .btn{border:1px solid var(--border);border-radius:10px;padding:9px 11px;text-decoration:none;color:var(--text);background:#fff;font-weight:600}
+    .lang-switch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:7px 10px;background:#fff}
+    .lang-dot{width:16px;height:16px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;background:linear-gradient(145deg,#18374d,#2f627f)}
+    .lang-select{border:0;background:transparent;font-size:12px;font-weight:700;color:var(--text);min-width:120px;outline:none;appearance:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px}
     h1{margin:0 0 10px;font-size:32px;letter-spacing:-.5px}p{line-height:1.58;color:#33495f}code{background:#f5f8fa;border:1px solid #d7dee6;border-radius:6px;padding:1px 4px}
   </style>
@@ -39,17 +43,93 @@
     <header class="top">
       <img class="logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
       <nav class="nav">
-        <a class="btn" href="index.html">Calculator</a>
-        <a class="btn" href="tracker.html">Tracker</a>
-        <a class="btn" href="info.html">Info</a>
+        <div class="lang-switch">
+          <span class="lang-dot" aria-hidden="true">◉</span>
+          <label class="sr-only" for="langSelect">Language</label>
+          <select id="langSelect" class="lang-select" aria-label="Language">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="no">Norsk</option>
+            <option value="sv">Svenska</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <a class="btn" id="navCalc" href="index.html">Calculator</a>
+        <a class="btn" id="navTracker" href="tracker.html">Tracker</a>
+        <a class="btn" id="navInfo" href="info.html">Info</a>
       </nav>
     </header>
     <article class="card">
-      <h1>Privacy</h1>
-      <p>CommutingValue stores calculator and trip data in your browser <code>sessionStorage</code> by default.</p>
-      <p>Session data is scoped to your current browser session and is not sent to a backend by this static site.</p>
-      <p>Map helper buttons open external map sites in a new tab. Their own privacy policies apply there.</p>
+      <h1 id="privacyTitle">Privacy</h1>
+      <p id="p1">CommutingValue stores calculator and trip data in your browser <code>sessionStorage</code> by default.</p>
+      <p id="p2">Session data is scoped to your current browser session and is not sent to a backend by this static site.</p>
+      <p id="p3">Map helper buttons open external map sites in a new tab. Their own privacy policies apply there.</p>
     </article>
   </main>
+  <script>
+    const I18N = {
+      en: {
+        pageTitle: "CommutingValue Privacy",
+        navCalc: "Calculator", navTracker: "Tracker", navInfo: "Info", privacyTitle: "Privacy",
+        p1: "CommutingValue stores calculator and trip data in your browser <code>sessionStorage</code> by default.",
+        p2: "Session data is scoped to your current browser session and is not sent to a backend by this static site.",
+        p3: "Map helper buttons open external map sites in a new tab. Their own privacy policies apply there."
+      },
+      es: {
+        pageTitle: "CommutingValue Privacidad",
+        navCalc: "Calculadora", navTracker: "Rastreador", navInfo: "Información", privacyTitle: "Privacidad",
+        p1: "CommutingValue guarda por defecto los datos de calculadora y viajes en <code>sessionStorage</code> de tu navegador.",
+        p2: "Los datos quedan limitados a la sesión actual del navegador y este sitio estático no los envía a ningún backend.",
+        p3: "Los botones de mapas abren sitios externos en una nueva pestaña. Sus propias políticas de privacidad aplican allí."
+      },
+      zh: {
+        pageTitle: "CommutingValue 隐私",
+        navCalc: "计算器", navTracker: "追踪器", navInfo: "信息", privacyTitle: "隐私",
+        p1: "CommutingValue 默认将计算器和行程数据保存在浏览器 <code>sessionStorage</code> 中。",
+        p2: "这些数据仅限于当前浏览器会话，本静态网站不会发送到后端。",
+        p3: "地图辅助按钮会在新标签页打开外部地图网站，其隐私政策由对应网站决定。"
+      },
+      no: {
+        pageTitle: "CommutingValue Personvern",
+        navCalc: "Kalkulator", navTracker: "Tracker", navInfo: "Info", privacyTitle: "Personvern",
+        p1: "CommutingValue lagrer kalkulator- og turdata i nettleserens <code>sessionStorage</code> som standard.",
+        p2: "Øktdata er avgrenset til gjeldende nettleserøkt og sendes ikke til backend av dette statiske nettstedet.",
+        p3: "Kartknapper åpner eksterne kartsider i ny fane. Der gjelder deres egne personvernregler."
+      },
+      sv: {
+        pageTitle: "CommutingValue Integritet",
+        navCalc: "Kalkylator", navTracker: "Tracker", navInfo: "Info", privacyTitle: "Integritet",
+        p1: "CommutingValue lagrar kalkylator- och resedata i webbläsarens <code>sessionStorage</code> som standard.",
+        p2: "Sessionsdata är begränsad till aktuell webbläsarsession och skickas inte till backend av denna statiska sida.",
+        p3: "Kartknappar öppnar externa kartsidor i ny flik. Deras egna integritetspolicyer gäller där."
+      },
+      de: {
+        pageTitle: "CommutingValue Datenschutz",
+        navCalc: "Rechner", navTracker: "Tracker", navInfo: "Info", privacyTitle: "Datenschutz",
+        p1: "CommutingValue speichert Rechner- und Fahrtdaten standardmäßig im Browser-<code>sessionStorage</code>.",
+        p2: "Sitzungsdaten gelten nur für die aktuelle Browser-Sitzung und werden von dieser statischen Seite nicht an ein Backend gesendet.",
+        p3: "Karten-Helfer öffnen externe Kartenseiten in einem neuen Tab. Dort gelten deren eigene Datenschutzrichtlinien."
+      }
+    };
+
+    function applyLanguage(lang) {
+      const current = I18N[lang] ? lang : "en";
+      localStorage.setItem("cv_lang", current);
+      document.documentElement.lang = current === "zh" ? "zh-CN" : current;
+      document.title = I18N[current].pageTitle;
+      document.getElementById("langSelect").value = current;
+      ["navCalc","navTracker","navInfo","privacyTitle"].forEach((id) => {
+        document.getElementById(id).textContent = I18N[current][id];
+      });
+      ["p1","p2","p3"].forEach((id) => {
+        document.getElementById(id).innerHTML = I18N[current][id];
+      });
+    }
+
+    const saved = localStorage.getItem("cv_lang") || "en";
+    applyLanguage(saved);
+    document.getElementById("langSelect").addEventListener("change", (e) => applyLanguage(e.target.value));
+  </script>
 </body>
 </html>

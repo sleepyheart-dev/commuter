@@ -105,6 +105,55 @@
 
     .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 22%);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+    }
+
+    .lang-globe {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #fff;
+      background: linear-gradient(150deg, color-mix(in srgb, var(--accent), #ffffff 10%), color-mix(in srgb, var(--accent-2), #ffffff 12%));
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 88%);
+    }
+
+    .lang-select {
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 0 14px 0 0;
+      min-width: 126px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
     .btn {
       appearance: none;
       border: 1px solid var(--border);
@@ -280,10 +329,22 @@
     <header class="topbar">
       <div class="brand" aria-label="CommutingValue">
         <img class="brand-logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
-        <div class="brand-sub">Manual tracker</div>
+        <div class="brand-sub" id="trackerBrandSub">Manual tracker</div>
       </div>
       <div class="actions">
-        <a class="btn ghost" href="index.html">Calculator</a>
+        <div class="lang-switch">
+          <span class="lang-globe" aria-hidden="true">◉</span>
+          <label class="sr-only" for="langSelect">Language</label>
+          <select class="lang-select" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="no">Norsk</option>
+            <option value="sv">Svenska</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <a class="btn ghost" id="navCalcBtn" href="index.html">Calculator</a>
         <button class="btn ghost" id="themeBtn" type="button">Theme</button>
         <button class="btn danger" id="resetTripsBtn" type="button">Reset trips</button>
       </div>
@@ -291,27 +352,27 @@
 
     <section class="card">
       <div class="section-title">
-        <h1>Manual trip tracker</h1>
-        <div class="hint">Session-only storage</div>
+        <h1 id="trackerTitle">Manual trip tracker</h1>
+        <div class="hint" id="trackerHint">Session-only storage</div>
       </div>
-      <p class="fine" style="font-size:13px; margin-top:0;">
+      <p class="fine" style="font-size:13px; margin-top:0;" id="trackerIntro">
         Start and stop the timer for each commute leg. Trips are stored in this browser session only.
       </p>
 
       <div class="row">
         <div>
-          <label for="mode">Transport mode</label>
+          <label id="labelMode" for="mode">Transport mode</label>
           <select id="mode">
-            <option>Walk</option>
-            <option>Bike</option>
-            <option>Bus</option>
-            <option>Train</option>
-            <option selected>Car</option>
-            <option>Other</option>
+            <option value="walk">Walk</option>
+            <option value="bike">Bike</option>
+            <option value="bus">Bus</option>
+            <option value="train">Train</option>
+            <option value="car" selected>Car</option>
+            <option value="other">Other</option>
           </select>
         </div>
         <div>
-          <label for="tripDirectCost">Direct trip spend (optional)</label>
+          <label id="labelTripCost" for="tripDirectCost">Direct trip spend (optional)</label>
           <input id="tripDirectCost" type="number" min="0" step="0.01" inputmode="decimal" placeholder="fare, toll, parking" />
         </div>
       </div>
@@ -336,21 +397,21 @@
       <div class="divider"></div>
 
       <div class="section-title" style="margin:0;">
-        <h2>This week</h2>
+        <h2 id="weekTitle">This week</h2>
         <div class="hint" id="weekLabel"></div>
       </div>
 
       <div class="kpi" style="margin-top:10px;">
         <div class="tile">
-          <div class="label">Trips logged</div>
+          <div class="label" id="kpiTrips">Trips logged</div>
           <div class="value" id="weekTrips">0</div>
         </div>
         <div class="tile">
-          <div class="label">Commute time</div>
+          <div class="label" id="kpiTime">Commute time</div>
           <div class="value" id="weekTime">0 min</div>
         </div>
         <div class="tile">
-          <div class="label">Estimated burden</div>
+          <div class="label" id="kpiBurden">Estimated burden</div>
           <div class="value" id="weekValue">-</div>
         </div>
       </div>
@@ -358,7 +419,7 @@
       <div class="divider"></div>
 
       <div class="section-title" id="history" style="margin:0;">
-        <h2>Trip history</h2>
+        <h2 id="historyTitle">Trip history</h2>
         <div class="hint"><button class="btn" id="exportBtn" type="button">Copy CSV</button></div>
       </div>
       <div class="list" id="tripList"></div>
@@ -366,15 +427,15 @@
 
     <footer>
       <div>
-        <div><strong>CommutingValue</strong> - manual trip tracker.</div>
-        <div class="fine">Session-only storage by default.</div>
+        <div id="footerLine"><strong>CommutingValue</strong> - manual trip tracker.</div>
+        <div class="fine" id="footerSub">Session-only storage by default.</div>
       </div>
       <div style="display:flex; gap:13px; flex-wrap:wrap;">
-        <a href="index.html">Calculator</a>
-        <a href="info.html">Info</a>
-        <a href="about.html">About</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms and Conditions</a>
+        <a id="footerCalc" href="index.html">Calculator</a>
+        <a id="footerInfo" href="info.html">Info</a>
+        <a id="footerAbout" href="about.html">About</a>
+        <a id="footerPrivacy" href="privacy.html">Privacy</a>
+        <a id="footerTerms" href="terms.html">Terms and Conditions</a>
       </div>
     </footer>
   </main>
@@ -386,13 +447,404 @@
     const KEYS = {
       theme: "cv_theme",
       calc: "cv_calc",
-      trips: "cv_trips"
+      trips: "cv_trips",
+      lang: "cv_lang"
+    };
+
+    const LOCALE_BY_LANG = {
+      en: "en-US",
+      es: "es-ES",
+      zh: "zh-CN",
+      no: "nb-NO",
+      sv: "sv-SE",
+      de: "de-DE"
+    };
+
+    const I18N = {
+      en: {
+        pageTitle: "CommutingValue Tracker - Manual Trip Timer",
+        trackerBrandSub: "Manual tracker",
+        navCalcBtn: "Calculator",
+        themeBtn: "Theme",
+        resetTripsBtn: "Reset trips",
+        trackerTitle: "Manual trip tracker",
+        trackerHint: "Session-only storage",
+        trackerIntro: "Start and stop the timer for each commute leg. Trips are stored in this browser session only.",
+        labelMode: "Transport mode",
+        labelTripCost: "Direct trip spend (optional)",
+        startBtn: "Start",
+        stopBtn: "Stop",
+        saveBtn: "Save trip",
+        weekTitle: "This week",
+        kpiTrips: "Trips logged",
+        kpiTime: "Commute time",
+        kpiBurden: "Estimated burden",
+        historyTitle: "Trip history",
+        exportBtn: "Copy CSV",
+        footerLine: "<strong>CommutingValue</strong> - manual trip tracker.",
+        footerSub: "Session-only storage by default.",
+        footerCalc: "Calculator",
+        footerInfo: "Info",
+        footerAbout: "About",
+        footerPrivacy: "Privacy",
+        footerTerms: "Terms and Conditions",
+        phTripCost: "fare, toll, parking",
+        timerReady: "Ready",
+        timerRunning: "Running...",
+        timerStopped: "Stopped - save this trip?",
+        timerStartedAt: "Started: {time}",
+        modeTag: "Mode: {mode}",
+        weekLabel: "ISO week {week}, {year}",
+        noTrips: "No trips yet.",
+        directSpend: "direct {cost}",
+        deleteBtn: "Delete",
+        confirmDelete: "Delete this trip?",
+        confirmShortTrip: "Trip is under 15 seconds. Save anyway?",
+        noTripsExport: "No trips to export.",
+        csvCopied: "CSV copied.",
+        promptCopyCsv: "Copy CSV:",
+        confirmResetTrips: "Clear all tracked trips in this session?",
+        tripsCleared: "Session trips cleared.",
+        modeWalk: "Walk",
+        modeBike: "Bike",
+        modeBus: "Bus",
+        modeTrain: "Train",
+        modeCar: "Car",
+        modeOther: "Other"
+      },
+      es: {
+        pageTitle: "CommutingValue Tracker - Temporizador manual",
+        trackerBrandSub: "Rastreador manual",
+        navCalcBtn: "Calculadora",
+        themeBtn: "Tema",
+        resetTripsBtn: "Restablecer viajes",
+        trackerTitle: "Rastreador manual de trayectos",
+        trackerHint: "Almacenamiento solo de sesión",
+        trackerIntro: "Inicia y detén el temporizador para cada tramo. Los viajes se guardan solo en esta sesión del navegador.",
+        labelMode: "Modo de transporte",
+        labelTripCost: "Gasto directo del trayecto (opcional)",
+        startBtn: "Iniciar",
+        stopBtn: "Detener",
+        saveBtn: "Guardar viaje",
+        weekTitle: "Esta semana",
+        kpiTrips: "Viajes registrados",
+        kpiTime: "Tiempo de desplazamiento",
+        kpiBurden: "Carga estimada",
+        historyTitle: "Historial de viajes",
+        exportBtn: "Copiar CSV",
+        footerLine: "<strong>CommutingValue</strong> - rastreador manual de trayectos.",
+        footerSub: "Almacenamiento por sesión por defecto.",
+        footerCalc: "Calculadora",
+        footerInfo: "Información",
+        footerAbout: "Acerca de",
+        footerPrivacy: "Privacidad",
+        footerTerms: "Términos y condiciones",
+        phTripCost: "tarifa, peaje, parking",
+        timerReady: "Listo",
+        timerRunning: "En marcha...",
+        timerStopped: "Detenido. ¿Guardar este viaje?",
+        timerStartedAt: "Iniciado: {time}",
+        modeTag: "Modo: {mode}",
+        weekLabel: "Semana ISO {week}, {year}",
+        noTrips: "Aún no hay viajes.",
+        directSpend: "directo {cost}",
+        deleteBtn: "Eliminar",
+        confirmDelete: "¿Eliminar este viaje?",
+        confirmShortTrip: "El viaje dura menos de 15 segundos. ¿Guardar igualmente?",
+        noTripsExport: "No hay viajes para exportar.",
+        csvCopied: "CSV copiado.",
+        promptCopyCsv: "Copia CSV:",
+        confirmResetTrips: "¿Borrar todos los viajes de esta sesión?",
+        tripsCleared: "Viajes de sesión eliminados.",
+        modeWalk: "Caminar",
+        modeBike: "Bici",
+        modeBus: "Autobús",
+        modeTrain: "Tren",
+        modeCar: "Coche",
+        modeOther: "Otro"
+      },
+      zh: {
+        pageTitle: "CommutingValue 追踪器 - 手动通勤计时",
+        trackerBrandSub: "手动追踪器",
+        navCalcBtn: "计算器",
+        themeBtn: "主题",
+        resetTripsBtn: "重置行程",
+        trackerTitle: "手动行程追踪器",
+        trackerHint: "仅会话存储",
+        trackerIntro: "每段通勤开始和停止计时。行程仅保存在当前浏览器会话中。",
+        labelMode: "交通方式",
+        labelTripCost: "单次直接支出（可选）",
+        startBtn: "开始",
+        stopBtn: "停止",
+        saveBtn: "保存行程",
+        weekTitle: "本周",
+        kpiTrips: "已记录行程",
+        kpiTime: "通勤时间",
+        kpiBurden: "估算负担",
+        historyTitle: "行程历史",
+        exportBtn: "复制 CSV",
+        footerLine: "<strong>CommutingValue</strong> - 手动行程追踪。",
+        footerSub: "默认仅会话存储。",
+        footerCalc: "计算器",
+        footerInfo: "信息",
+        footerAbout: "关于",
+        footerPrivacy: "隐私",
+        footerTerms: "条款",
+        phTripCost: "车费、过路费、停车费",
+        timerReady: "就绪",
+        timerRunning: "计时中...",
+        timerStopped: "已停止 - 保存此行程？",
+        timerStartedAt: "开始时间：{time}",
+        modeTag: "方式：{mode}",
+        weekLabel: "ISO 第 {week} 周，{year}",
+        noTrips: "暂无行程。",
+        directSpend: "直接支出 {cost}",
+        deleteBtn: "删除",
+        confirmDelete: "删除该行程？",
+        confirmShortTrip: "行程不足 15 秒，仍要保存吗？",
+        noTripsExport: "没有可导出的行程。",
+        csvCopied: "CSV 已复制。",
+        promptCopyCsv: "复制 CSV：",
+        confirmResetTrips: "清除此会话中的全部行程？",
+        tripsCleared: "会话行程已清除。",
+        modeWalk: "步行",
+        modeBike: "骑行",
+        modeBus: "公交",
+        modeTrain: "火车",
+        modeCar: "汽车",
+        modeOther: "其他"
+      },
+      no: {
+        pageTitle: "CommutingValue Tracker - Manuell turtimer",
+        trackerBrandSub: "Manuell tracker",
+        navCalcBtn: "Kalkulator",
+        themeBtn: "Tema",
+        resetTripsBtn: "Nullstill turer",
+        trackerTitle: "Manuell turtracker",
+        trackerHint: "Kun øktlagring",
+        trackerIntro: "Start og stopp timeren for hver etappe. Turene lagres kun i denne nettleserøkten.",
+        labelMode: "Transportmåte",
+        labelTripCost: "Direkte kostnad for tur (valgfritt)",
+        startBtn: "Start",
+        stopBtn: "Stopp",
+        saveBtn: "Lagre tur",
+        weekTitle: "Denne uken",
+        kpiTrips: "Registrerte turer",
+        kpiTime: "Pendletid",
+        kpiBurden: "Estimert belastning",
+        historyTitle: "Turhistorikk",
+        exportBtn: "Kopier CSV",
+        footerLine: "<strong>CommutingValue</strong> - manuell turtracker.",
+        footerSub: "Kun øktlagring som standard.",
+        footerCalc: "Kalkulator",
+        footerInfo: "Info",
+        footerAbout: "Om",
+        footerPrivacy: "Personvern",
+        footerTerms: "Vilkår",
+        phTripCost: "billett, bom, parkering",
+        timerReady: "Klar",
+        timerRunning: "Kjører...",
+        timerStopped: "Stoppet - lagre denne turen?",
+        timerStartedAt: "Startet: {time}",
+        modeTag: "Modus: {mode}",
+        weekLabel: "ISO-uke {week}, {year}",
+        noTrips: "Ingen turer ennå.",
+        directSpend: "direkte {cost}",
+        deleteBtn: "Slett",
+        confirmDelete: "Slette denne turen?",
+        confirmShortTrip: "Turen er under 15 sekunder. Lagre likevel?",
+        noTripsExport: "Ingen turer å eksportere.",
+        csvCopied: "CSV kopiert.",
+        promptCopyCsv: "Kopier CSV:",
+        confirmResetTrips: "Tømme alle turer i denne økten?",
+        tripsCleared: "Øktturer slettet.",
+        modeWalk: "Gå",
+        modeBike: "Sykkel",
+        modeBus: "Buss",
+        modeTrain: "Tog",
+        modeCar: "Bil",
+        modeOther: "Annet"
+      },
+      sv: {
+        pageTitle: "CommutingValue Tracker - Manuell resetimer",
+        trackerBrandSub: "Manuell tracker",
+        navCalcBtn: "Kalkylator",
+        themeBtn: "Tema",
+        resetTripsBtn: "Återställ resor",
+        trackerTitle: "Manuell rese-tracker",
+        trackerHint: "Endast sessionslagring",
+        trackerIntro: "Starta och stoppa timern för varje pendlingsdel. Resor lagras endast i denna webbläsarsession.",
+        labelMode: "Transportläge",
+        labelTripCost: "Direkt kostnad för resa (valfritt)",
+        startBtn: "Starta",
+        stopBtn: "Stoppa",
+        saveBtn: "Spara resa",
+        weekTitle: "Den här veckan",
+        kpiTrips: "Loggade resor",
+        kpiTime: "Pendlingstid",
+        kpiBurden: "Beräknad belastning",
+        historyTitle: "Resehistorik",
+        exportBtn: "Kopiera CSV",
+        footerLine: "<strong>CommutingValue</strong> - manuell rese-tracker.",
+        footerSub: "Endast sessionslagring som standard.",
+        footerCalc: "Kalkylator",
+        footerInfo: "Info",
+        footerAbout: "Om",
+        footerPrivacy: "Integritet",
+        footerTerms: "Villkor",
+        phTripCost: "biljett, tull, parkering",
+        timerReady: "Klar",
+        timerRunning: "Pågår...",
+        timerStopped: "Stoppad - spara denna resa?",
+        timerStartedAt: "Startad: {time}",
+        modeTag: "Läge: {mode}",
+        weekLabel: "ISO-vecka {week}, {year}",
+        noTrips: "Inga resor ännu.",
+        directSpend: "direkt {cost}",
+        deleteBtn: "Ta bort",
+        confirmDelete: "Ta bort den här resan?",
+        confirmShortTrip: "Resan är under 15 sekunder. Spara ändå?",
+        noTripsExport: "Inga resor att exportera.",
+        csvCopied: "CSV kopierad.",
+        promptCopyCsv: "Kopiera CSV:",
+        confirmResetTrips: "Rensa alla resor i den här sessionen?",
+        tripsCleared: "Sessionsresor rensade.",
+        modeWalk: "Gång",
+        modeBike: "Cykel",
+        modeBus: "Buss",
+        modeTrain: "Tåg",
+        modeCar: "Bil",
+        modeOther: "Annat"
+      },
+      de: {
+        pageTitle: "CommutingValue Tracker - Manueller Fahrtimer",
+        trackerBrandSub: "Manueller Tracker",
+        navCalcBtn: "Rechner",
+        themeBtn: "Design",
+        resetTripsBtn: "Fahrten zurücksetzen",
+        trackerTitle: "Manueller Fahrt-Tracker",
+        trackerHint: "Nur Sitzungsdaten",
+        trackerIntro: "Starte und stoppe den Timer für jede Pendelstrecke. Fahrten werden nur in dieser Browser-Sitzung gespeichert.",
+        labelMode: "Verkehrsmittel",
+        labelTripCost: "Direkte Fahrtkosten (optional)",
+        startBtn: "Start",
+        stopBtn: "Stopp",
+        saveBtn: "Fahrt speichern",
+        weekTitle: "Diese Woche",
+        kpiTrips: "Erfasste Fahrten",
+        kpiTime: "Pendelzeit",
+        kpiBurden: "Geschätzte Belastung",
+        historyTitle: "Fahrtverlauf",
+        exportBtn: "CSV kopieren",
+        footerLine: "<strong>CommutingValue</strong> - manueller Fahrt-Tracker.",
+        footerSub: "Standardmäßig nur Sitzungsdaten.",
+        footerCalc: "Rechner",
+        footerInfo: "Info",
+        footerAbout: "Über",
+        footerPrivacy: "Datenschutz",
+        footerTerms: "Nutzungsbedingungen",
+        phTripCost: "Ticket, Maut, Parken",
+        timerReady: "Bereit",
+        timerRunning: "Läuft...",
+        timerStopped: "Gestoppt - diese Fahrt speichern?",
+        timerStartedAt: "Gestartet: {time}",
+        modeTag: "Modus: {mode}",
+        weekLabel: "ISO-Woche {week}, {year}",
+        noTrips: "Noch keine Fahrten.",
+        directSpend: "direkt {cost}",
+        deleteBtn: "Löschen",
+        confirmDelete: "Diese Fahrt löschen?",
+        confirmShortTrip: "Fahrt ist unter 15 Sekunden. Trotzdem speichern?",
+        noTripsExport: "Keine Fahrten zum Exportieren.",
+        csvCopied: "CSV kopiert.",
+        promptCopyCsv: "CSV kopieren:",
+        confirmResetTrips: "Alle Fahrten in dieser Sitzung löschen?",
+        tripsCleared: "Sitzungsfahrten gelöscht.",
+        modeWalk: "Zu Fuß",
+        modeBike: "Fahrrad",
+        modeBus: "Bus",
+        modeTrain: "Zug",
+        modeCar: "Auto",
+        modeOther: "Sonstiges"
+      }
     };
 
     const TIMER = {
       interval: null,
       startMs: null
     };
+
+    let currentLang = "en";
+
+    function t(key) {
+      return I18N[currentLang]?.[key] ?? I18N.en[key] ?? key;
+    }
+
+    function tmpl(key, vars = {}) {
+      let text = t(key);
+      for (const [name, value] of Object.entries(vars)) {
+        text = text.replaceAll(`{${name}}`, String(value));
+      }
+      return text;
+    }
+
+    function setText(id, key) {
+      const el = $(id);
+      if (el) el.textContent = t(key);
+    }
+
+    function setHTML(id, key) {
+      const el = $(id);
+      if (el) el.innerHTML = t(key);
+    }
+
+    function modeLabel(mode) {
+      const normalized = normalizeMode(mode);
+      const map = {
+        walk: t("modeWalk"),
+        bike: t("modeBike"),
+        bus: t("modeBus"),
+        train: t("modeTrain"),
+        car: t("modeCar"),
+        other: t("modeOther")
+      };
+      return map[normalized] || mode || t("modeOther");
+    }
+
+    function applyLanguage(lang) {
+      currentLang = I18N[lang] ? lang : "en";
+      localStorage.setItem(KEYS.lang, currentLang);
+      document.documentElement.lang = currentLang === "zh" ? "zh-CN" : currentLang;
+      document.title = t("pageTitle");
+      $("langSelect").value = currentLang;
+
+      [
+        "trackerBrandSub", "navCalcBtn", "themeBtn", "resetTripsBtn", "trackerTitle",
+        "trackerHint", "trackerIntro", "labelMode", "labelTripCost", "startBtn",
+        "stopBtn", "saveBtn", "weekTitle", "kpiTrips", "kpiTime", "kpiBurden",
+        "historyTitle", "exportBtn", "footerSub", "footerCalc", "footerInfo",
+        "footerAbout", "footerPrivacy", "footerTerms"
+      ].forEach((id) => setText(id, id));
+      setHTML("footerLine", "footerLine");
+      $("tripDirectCost").placeholder = t("phTripCost");
+
+      Array.from($("mode").options).forEach((option) => {
+        const key = `mode${option.value.charAt(0).toUpperCase()}${option.value.slice(1)}`;
+        if (I18N[currentLang][key] || I18N.en[key]) option.textContent = t(key);
+      });
+
+      updateModeTag();
+      setTimerUI(TIMER.startMs ? "running" : ($("saveBtn").disabled ? "ready" : "stopped"));
+      updateWeekLabel();
+      renderTripList();
+      updateWeekSummary();
+    }
+
+    function initLanguage() {
+      const saved = localStorage.getItem(KEYS.lang);
+      applyLanguage(I18N[saved] ? saved : "en");
+      $("langSelect").addEventListener("change", (event) => applyLanguage(event.target.value));
+    }
 
     function loadJSON(key, fallback) {
       try {
@@ -407,7 +859,9 @@
       STORE.setItem(key, JSON.stringify(value));
     }
 
-    function pad(n) { return String(n).padStart(2, "0"); }
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
 
     function msToHMS(ms) {
       const totalSeconds = Math.floor(ms / 1000);
@@ -419,7 +873,7 @@
 
     function formatMoney(amount, currency) {
       if (!Number.isFinite(amount)) return "-";
-      return new Intl.NumberFormat(undefined, {
+      return new Intl.NumberFormat(LOCALE_BY_LANG[currentLang] || undefined, {
         style: "currency",
         currency,
         maximumFractionDigits: 0
@@ -473,22 +927,40 @@
       saveJSON(KEYS.trips, trips);
     }
 
+    function normalizeMode(rawMode) {
+      const text = String(rawMode || "").toLowerCase();
+      const map = {
+        walk: "walk",
+        bike: "bike",
+        bus: "bus",
+        train: "train",
+        car: "car",
+        other: "other",
+        gå: "walk",
+        sykkel: "bike",
+        buss: "bus",
+        tog: "train",
+        bil: "car"
+      };
+      return map[text] || text || "other";
+    }
+
     function setTimerUI(state) {
       if (state === "ready") {
-        $("timerState").textContent = "Ready";
+        $("timerState").textContent = t("timerReady");
         $("startBtn").disabled = false;
         $("stopBtn").disabled = true;
         $("saveBtn").disabled = true;
         $("timerStartedAt").textContent = "";
       }
       if (state === "running") {
-        $("timerState").textContent = "Running...";
+        $("timerState").textContent = t("timerRunning");
         $("startBtn").disabled = true;
         $("stopBtn").disabled = false;
         $("saveBtn").disabled = true;
       }
       if (state === "stopped") {
-        $("timerState").textContent = "Stopped - save this trip?";
+        $("timerState").textContent = t("timerStopped");
         $("startBtn").disabled = false;
         $("stopBtn").disabled = true;
         $("saveBtn").disabled = false;
@@ -496,7 +968,7 @@
     }
 
     function updateModeTag() {
-      $("timerModeTag").textContent = `Mode: ${$("mode").value}`;
+      $("timerModeTag").textContent = tmpl("modeTag", { mode: modeLabel($("mode").value) });
     }
 
     function tickTimer() {
@@ -510,26 +982,28 @@
       const box = $("tripList");
       box.innerHTML = "";
       if (!trips.length) {
-        box.innerHTML = '<div class="fine">No trips yet.</div>';
+        box.innerHTML = `<div class="fine">${t("noTrips")}</div>`;
         return;
       }
 
       const calc = readCalcInputs();
-      for (const t of trips.slice(0, 100)) {
-        const dt = new Date(t.createdAt);
-        const mins = t.durationMin || 0;
-        const burden = calc.wage > 0 ? ((mins / 60) * calc.wage + (Number(t.directCost) || 0)) : (Number(t.directCost) || 0);
+      const locale = LOCALE_BY_LANG[currentLang] || undefined;
+      for (const tData of trips.slice(0, 100)) {
+        const dt = new Date(tData.createdAt);
+        const mins = tData.durationMin || 0;
+        const directCost = Number(tData.directCost) || 0;
+        const burden = calc.wage > 0 ? ((mins / 60) * calc.wage + directCost) : directCost;
 
         const el = document.createElement("div");
         el.className = "item";
         el.innerHTML = `
           <div>
-            <div class="t">${t.mode} <span class="s">- ${dt.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} - ${dt.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span></div>
-            <div class="s">${mins.toFixed(1)} min${t.directCost ? ` - direct ${formatMoney(Number(t.directCost), calc.currency)}` : ""}</div>
+            <div class="t">${modeLabel(tData.mode)} <span class="s">- ${dt.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" })} - ${dt.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}</span></div>
+            <div class="s">${mins.toFixed(1)} min${directCost ? ` - ${tmpl("directSpend", { cost: formatMoney(directCost, calc.currency) })}` : ""}</div>
           </div>
           <div style="text-align:right;">
             <div class="t">${burden > 0 ? formatMoney(burden, calc.currency) : "-"}</div>
-            <button class="btn ghost" type="button" data-del="${t.id}">Delete</button>
+            <button class="btn ghost" type="button" data-del="${tData.id}">${t("deleteBtn")}</button>
           </div>
         `;
         box.appendChild(el);
@@ -537,7 +1011,7 @@
 
       box.querySelectorAll("[data-del]").forEach((btn) => {
         btn.addEventListener("click", () => {
-          if (!confirm("Delete this trip?")) return;
+          if (!confirm(t("confirmDelete"))) return;
           const id = btn.getAttribute("data-del");
           setTrips(getTrips().filter((x) => x.id !== id));
           renderTripList();
@@ -548,20 +1022,20 @@
 
     function updateWeekLabel() {
       const info = isoWeekInfo(new Date());
-      $("weekLabel").textContent = `ISO week ${info.week}, ${info.year}`;
+      $("weekLabel").textContent = tmpl("weekLabel", { week: info.week, year: info.year });
     }
 
     function updateWeekSummary() {
       const now = new Date();
-      const weekTrips = getTrips().filter((t) => isSameISOWeek(new Date(t.createdAt), now));
-      const totalMin = weekTrips.reduce((acc, t) => acc + (t.durationMin || 0), 0);
+      const weekTrips = getTrips().filter((tData) => isSameISOWeek(new Date(tData.createdAt), now));
+      const totalMin = weekTrips.reduce((acc, tData) => acc + (tData.durationMin || 0), 0);
       const totalHours = totalMin / 60;
 
       $("weekTrips").textContent = String(weekTrips.length);
       $("weekTime").textContent = totalHours >= 1 ? `${totalHours.toFixed(1)} h` : `${totalMin.toFixed(0)} min`;
 
       const calc = readCalcInputs();
-      const direct = weekTrips.reduce((acc, t) => acc + (Number(t.directCost) || 0), 0);
+      const direct = weekTrips.reduce((acc, tData) => acc + (Number(tData.directCost) || 0), 0);
       if (calc.wage > 0) {
         const burden = totalHours * calc.wage + direct;
         $("weekValue").textContent = formatMoney(burden, calc.currency);
@@ -573,6 +1047,7 @@
     }
 
     initTheme();
+    initLanguage();
     updateModeTag();
     updateWeekLabel();
     renderTripList();
@@ -589,7 +1064,8 @@
       if (TIMER.interval) clearInterval(TIMER.interval);
       TIMER.startMs = Date.now();
       $("timerDisplay").textContent = "00:00:00";
-      $("timerStartedAt").textContent = `Started: ${new Date(TIMER.startMs).toLocaleTimeString()}`;
+      const locale = LOCALE_BY_LANG[currentLang] || undefined;
+      $("timerStartedAt").textContent = tmpl("timerStartedAt", { time: new Date(TIMER.startMs).toLocaleTimeString(locale) });
       setTimerUI("running");
       TIMER.interval = setInterval(tickTimer, 250);
     });
@@ -606,7 +1082,7 @@
       if (!TIMER.startMs) return;
       const endMs = Date.now();
       const durationMs = Math.max(0, endMs - TIMER.startMs);
-      if (durationMs < 15000 && !confirm("Trip is under 15 seconds. Save anyway?")) return;
+      if (durationMs < 15000 && !confirm(t("confirmShortTrip"))) return;
 
       const trip = {
         id: globalThis.crypto?.randomUUID?.() || String(Math.random()).slice(2),
@@ -615,7 +1091,7 @@
         endMs,
         durationMs,
         durationMin: durationMs / 60000,
-        mode: $("mode").value,
+        mode: normalizeMode($("mode").value),
         directCost: Number($("tripDirectCost").value) || 0
       };
 
@@ -631,22 +1107,22 @@
     $("exportBtn").addEventListener("click", async () => {
       const trips = getTrips();
       if (!trips.length) {
-        alert("No trips to export.");
+        alert(t("noTripsExport"));
         return;
       }
       const header = ["createdAt", "mode", "durationMin", "directCost"];
-      const rows = trips.map((t) => [t.createdAt, t.mode, (t.durationMin || 0).toFixed(2), (Number(t.directCost) || 0).toFixed(2)]);
+      const rows = trips.map((tData) => [tData.createdAt, normalizeMode(tData.mode), (tData.durationMin || 0).toFixed(2), (Number(tData.directCost) || 0).toFixed(2)]);
       const csv = [header.join(","), ...rows.map((r) => r.map((x) => `"${String(x).replaceAll('"', '""')}"`).join(","))].join("\n");
       try {
         await navigator.clipboard.writeText(csv);
-        alert("CSV copied.");
+        alert(t("csvCopied"));
       } catch {
-        prompt("Copy CSV:", csv);
+        prompt(t("promptCopyCsv"), csv);
       }
     });
 
     $("resetTripsBtn").addEventListener("click", () => {
-      if (!confirm("Clear all tracked trips in this session?")) return;
+      if (!confirm(t("confirmResetTrips"))) return;
       STORE.removeItem(KEYS.trips);
       if (TIMER.interval) {
         clearInterval(TIMER.interval);
@@ -658,7 +1134,7 @@
       setTimerUI("ready");
       renderTripList();
       updateWeekSummary();
-      alert("Session trips cleared.");
+      alert(t("tripsCleared"));
     });
   </script>
 </body>

@@ -30,6 +30,10 @@
     .wrap{max-width:900px;margin:0 auto;padding:26px 16px 64px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
     .logo{width:220px;height:auto;display:block}.nav{display:flex;gap:8px;flex-wrap:wrap}
     .btn{border:1px solid var(--border);border-radius:10px;padding:9px 11px;text-decoration:none;color:var(--text);background:#fff;font-weight:600}
+    .lang-switch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:7px 10px;background:#fff}
+    .lang-dot{width:16px;height:16px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;background:linear-gradient(145deg,#18374d,#2f627f)}
+    .lang-select{border:0;background:transparent;font-size:12px;font-weight:700;color:var(--text);min-width:120px;outline:none;appearance:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px}
     h1{margin:0 0 10px;font-size:32px;letter-spacing:-.5px}p{line-height:1.58;color:#33495f} .muted{font-size:13px;color:var(--muted);margin-top:14px}
   </style>
@@ -39,14 +43,26 @@
     <header class="top">
       <img class="logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
       <nav class="nav">
-        <a class="btn" href="index.html">Calculator</a>
-        <a class="btn" href="tracker.html">Tracker</a>
-        <a class="btn" href="info.html">Info</a>
+        <div class="lang-switch">
+          <span class="lang-dot" aria-hidden="true">◉</span>
+          <label class="sr-only" for="langSelect">Language</label>
+          <select id="langSelect" class="lang-select" aria-label="Language">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="no">Norsk</option>
+            <option value="sv">Svenska</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <a class="btn" id="navCalc" href="index.html">Calculator</a>
+        <a class="btn" id="navTracker" href="tracker.html">Tracker</a>
+        <a class="btn" id="navInfo" href="info.html">Info</a>
       </nav>
     </header>
     <article class="card">
-      <h1>About</h1>
-      <p>
+      <h1 id="aboutTitle">About</h1>
+      <p id="aboutP1">
         The purpose of this site is to encourage conscious decisions about how one uses the time and money spent commuting.
         We are granted 24 hours per day for a limited time on earth (e.g., 80 years, 80 * 365 * 24 h to put it bluntly),
         so being aware of how this time is spent is important.
@@ -54,14 +70,84 @@
         Whether this time is spent to unwind and mode-switch, or sit frustrated in a car queue,
         can make a large difference over the long run.
       </p>
-      <p>
+      <p id="aboutP2">
         This website is inspired by Mr. Money Mustache's writing on this topic, especially
         <a href="https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/" target="_blank" rel="noopener noreferrer">The True Cost of Commuting</a>.
         CommutingValue is meant as a practical tool to help people calculate this in a fast, clear, and shareable way.
       </p>
-      <p class="muted">CommutingValue exists to support deliberate, long-horizon decisions about time.</p>
-      <p class="muted">Questions? Reach out to <a href="mailto:info@commutingvalue.com">info@commutingvalue.com</a>.</p>
+      <p class="muted" id="aboutP3">CommutingValue exists to support deliberate, long-horizon decisions about time.</p>
+      <p class="muted" id="aboutP4">Questions? Reach out to <a href="mailto:info@commutingvalue.com">info@commutingvalue.com</a>.</p>
     </article>
   </main>
+  <script>
+    const I18N = {
+      en: {
+        pageTitle: "CommutingValue About",
+        navCalc: "Calculator", navTracker: "Tracker", navInfo: "Info", aboutTitle: "About",
+        aboutP1: "The purpose of this site is to encourage conscious decisions about how one uses the time and money spent commuting. We are granted 24 hours per day for a limited time on earth (e.g., 80 years, 80 * 365 * 24 h to put it bluntly), so being aware of how this time is spent is important. Calculating the true cost of commuting can facilitate empowering choices. Whether this time is spent to unwind and mode-switch, or sit frustrated in a car queue, can make a large difference over the long run.",
+        aboutP2: "This website is inspired by Mr. Money Mustache's writing on this topic, especially <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>. CommutingValue is meant as a practical tool to help people calculate this in a fast, clear, and shareable way.",
+        aboutP3: "CommutingValue exists to support deliberate, long-horizon decisions about time.",
+        aboutP4: "Questions? Reach out to <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>."
+      },
+      es: {
+        pageTitle: "CommutingValue Acerca de",
+        navCalc: "Calculadora", navTracker: "Rastreador", navInfo: "Información", aboutTitle: "Acerca de",
+        aboutP1: "El propósito de este sitio es fomentar decisiones conscientes sobre cómo usamos el tiempo y el dinero destinados al desplazamiento diario. Tenemos 24 horas al día por un tiempo limitado en la tierra (por ejemplo, 80 años, 80 * 365 * 24 h), por lo que entender cómo se usa ese tiempo es importante. Calcular el costo real del desplazamiento puede facilitar decisiones más empoderadas. Ya sea que ese tiempo se use para desconectar y cambiar de modo, o para estar frustrado en una cola de autos, la diferencia a largo plazo puede ser grande.",
+        aboutP2: "Este sitio está inspirado en los textos de Mr. Money Mustache sobre este tema, especialmente <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>. CommutingValue es una herramienta práctica para facilitar este cálculo de forma rápida, clara y compartible.",
+        aboutP3: "CommutingValue existe para apoyar decisiones deliberadas y de largo plazo sobre el uso del tiempo.",
+        aboutP4: "¿Preguntas? Escríbenos a <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>."
+      },
+      zh: {
+        pageTitle: "CommutingValue 关于",
+        navCalc: "计算器", navTracker: "追踪器", navInfo: "信息", aboutTitle: "关于",
+        aboutP1: "本网站旨在鼓励人们对通勤所花费的时间和金钱做出更有意识的选择。我们每天只有 24 小时，而生命是有限的（例如 80 年，即 80 * 365 * 24 小时），因此了解时间如何被使用非常重要。计算通勤的真实成本可以帮助你做出更有力量的选择。无论这段时间用于放松和切换状态，还是在车流中焦躁等待，长期差异都很大。",
+        aboutP2: "本网站灵感来自 Mr. Money Mustache 关于该主题的文章，尤其是 <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>。CommutingValue 旨在成为一个实用工具，帮助大家快速、清晰且可分享地完成这一计算。",
+        aboutP3: "CommutingValue 致力于支持人们在时间使用上做出长期、审慎的决策。",
+        aboutP4: "如有问题，请联系 <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>。"
+      },
+      no: {
+        pageTitle: "CommutingValue Om",
+        navCalc: "Kalkulator", navTracker: "Tracker", navInfo: "Info", aboutTitle: "Om",
+        aboutP1: "Formålet med dette nettstedet er å oppmuntre til bevisste valg om hvordan man bruker tiden og pengene som går til pendling. Vi har 24 timer per dag i en begrenset tid på jorden (f.eks. 80 år, 80 * 365 * 24 timer), så det er viktig å være bevisst på hvordan denne tiden brukes. Å beregne den reelle kostnaden ved pendling kan legge til rette for mer myndiggjørende valg. Om tiden brukes til å koble av og skifte modus, eller til frustrasjon i kø, kan utgjøre stor forskjell over tid.",
+        aboutP2: "Nettstedet er inspirert av Mr. Money Mustache sine tekster om temaet, spesielt <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>. CommutingValue er ment som et praktisk verktøy for å gjøre denne beregningen raskt, tydelig og delbart.",
+        aboutP3: "CommutingValue finnes for å støtte bevisste beslutninger med lang tidshorisont.",
+        aboutP4: "Spørsmål? Kontakt <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>."
+      },
+      sv: {
+        pageTitle: "CommutingValue Om",
+        navCalc: "Kalkylator", navTracker: "Tracker", navInfo: "Info", aboutTitle: "Om",
+        aboutP1: "Syftet med den här sidan är att uppmuntra medvetna beslut om hur man använder tid och pengar som går till pendling. Vi har 24 timmar per dag under en begränsad tid på jorden (t.ex. 80 år, 80 * 365 * 24 h), så det är viktigt att förstå hur tiden används. Att beräkna den verkliga kostnaden för pendling kan möjliggöra mer stärkande val. Om tiden används för att varva ner och växla läge, eller för att sitta frustrerad i bilkö, gör stor skillnad över tid.",
+        aboutP2: "Webbplatsen är inspirerad av Mr. Money Mustaches texter om ämnet, särskilt <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>. CommutingValue är tänkt som ett praktiskt verktyg för att göra den här beräkningen snabbt, tydligt och delbart.",
+        aboutP3: "CommutingValue finns för att stödja medvetna beslut om tid med lång horisont.",
+        aboutP4: "Frågor? Kontakta <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>."
+      },
+      de: {
+        pageTitle: "CommutingValue Über",
+        navCalc: "Rechner", navTracker: "Tracker", navInfo: "Info", aboutTitle: "Über",
+        aboutP1: "Der Zweck dieser Website ist es, bewusste Entscheidungen darüber zu fördern, wie Zeit und Geld für das Pendeln eingesetzt werden. Wir haben pro Tag nur 24 Stunden und nur eine begrenzte Lebenszeit auf der Erde (z. B. 80 Jahre, 80 * 365 * 24 h). Deshalb ist es wichtig, wie diese Zeit verwendet wird. Die Berechnung der wahren Pendelkosten kann zu selbstbestimmteren Entscheidungen führen. Ob diese Zeit zum Abschalten und Umschalten genutzt wird oder frustriert im Stau vergeht, macht langfristig einen großen Unterschied.",
+        aboutP2: "Diese Website ist von den Texten von Mr. Money Mustache zu diesem Thema inspiriert, insbesondere von <a href=\"https://www.mrmoneymustache.com/2011/10/06/the-true-cost-of-commuting/\" target=\"_blank\" rel=\"noopener noreferrer\">The True Cost of Commuting</a>. CommutingValue ist als praktisches Tool gedacht, um diese Berechnung schnell, klar und teilbar zu machen.",
+        aboutP3: "CommutingValue soll bewusste Entscheidungen mit langfristiger Perspektive unterstützen.",
+        aboutP4: "Fragen? Schreib an <a href=\"mailto:info@commutingvalue.com\">info@commutingvalue.com</a>."
+      }
+    };
+
+    function applyLanguage(lang) {
+      const current = I18N[lang] ? lang : "en";
+      localStorage.setItem("cv_lang", current);
+      document.documentElement.lang = current === "zh" ? "zh-CN" : current;
+      document.title = I18N[current].pageTitle;
+      document.getElementById("langSelect").value = current;
+      ["navCalc", "navTracker", "navInfo", "aboutTitle"].forEach((id) => {
+        document.getElementById(id).textContent = I18N[current][id];
+      });
+      ["aboutP1", "aboutP2", "aboutP3", "aboutP4"].forEach((id) => {
+        document.getElementById(id).innerHTML = I18N[current][id];
+      });
+    }
+
+    const saved = localStorage.getItem("cv_lang") || "en";
+    applyLanguage(saved);
+    document.getElementById("langSelect").addEventListener("change", (e) => applyLanguage(e.target.value));
+  </script>
 </body>
 </html>
