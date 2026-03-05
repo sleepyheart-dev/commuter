@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="164" viewBox="0 0 840 164" role="img" aria-labelledby="title desc">
+  <title id="title">CommutingValue logo</title>
+  <desc id="desc">Minimal monoline icon with route, clock, and CommutingValue wordmark</desc>
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#163a59"/>
+      <stop offset="1" stop-color="#2f7568"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="840" height="164" fill="none"/>
+
+  <g transform="translate(8 14)">
+    <rect x="0" y="0" width="136" height="136" rx="34" fill="url(#g)"/>
+
+    <!-- discreet money stack bars -->
+    <rect x="90" y="42" width="10" height="26" rx="4" fill="#f2d78a" opacity="0.9"/>
+    <rect x="102" y="34" width="10" height="34" rx="4" fill="#f6de98" opacity="0.92"/>
+    <rect x="114" y="48" width="10" height="20" rx="4" fill="#e9cc79" opacity="0.88"/>
+
+    <!-- subtle route line for commuting feel -->
+    <path d="M18 98c18-14 34-22 50-22 13 0 26 5 39 15 11 8 20 12 30 12 11 0 20-4 29-13"
+      fill="none" stroke="#cfece3" stroke-width="8.2" stroke-linecap="round"/>
+
+    <!-- clock dial -->
+    <circle cx="56" cy="50" r="21" fill="none" stroke="#eaf7ff" stroke-width="6"/>
+    <path d="M56 50l0-10M56 50l9 4" stroke="#eaf7ff" stroke-width="5.5" stroke-linecap="round"/>
+
+    <!-- subtle stacked coins -->
+    <ellipse cx="92" cy="102" rx="12" ry="4.3" fill="#f6de98" opacity="0.95"/>
+    <ellipse cx="92" cy="97.5" rx="12" ry="4.3" fill="#efd487" opacity="0.95"/>
+    <ellipse cx="92" cy="93" rx="12" ry="4.3" fill="#e7c977" opacity="0.95"/>
+
+    <!-- value tick -->
+    <path d="M34 72l15 15 34-34" fill="none" stroke="#f7fcff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="166" y="88" font-family="Avenir Next, Inter, Segoe UI, Arial, sans-serif" font-size="60" font-weight="680" letter-spacing="-1.1" fill="#143550">Commuting</text>
+  <text x="166" y="134" font-family="Avenir Next, Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="680" letter-spacing="-0.9" fill="#2f7568">Value</text>
+</svg>

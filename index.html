@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CommutingValue - True Cost of Your Commute</title>
+  <meta name="description" content="Calculate your true commuting value: time, distance, direct travel cost, and annual burden. Session-only by default for privacy." />
+  <meta name="theme-color" content="#0f2134" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://commutingvalue.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CommutingValue" />
+  <meta property="og:title" content="CommutingValue - True Cost of Your Commute" />
+  <meta property="og:description" content="Calculate your true commuting value: time, distance, direct travel cost, and annual burden." />
+  <meta property="og:url" content="https://commutingvalue.com/" />
+  <meta property="og:image" content="https://commutingvalue.com/assets/logo-wordmark.svg" />
+  <meta property="og:image:alt" content="CommutingValue minimalist wordmark" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CommutingValue - True Cost of Your Commute" />
+  <meta name="twitter:description" content="Calculate your true commuting value in time and money." />
+  <meta name="twitter:image" content="https://commutingvalue.com/assets/logo-wordmark.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <style>
+    :root {
+      --bg: #edf2f8;
+      --panel: rgba(255, 255, 255, 0.68);
+      --panel-soft: rgba(255, 255, 255, 0.54);
+      --text: #142435;
+      --muted: #5d6f82;
+      --border: rgba(255, 255, 255, 0.62);
+      --accent: #1f4a67;
+      --accent-2: #3f7f88;
+      --danger: #9f2f2f;
+      --ok: #1f6b42;
+      --shadow: 0 20px 54px rgba(34, 58, 83, 0.14);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --glass-blur: 18px;
+      --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0e1825;
+      --panel: rgba(23, 36, 52, 0.62);
+      --panel-soft: rgba(18, 30, 44, 0.56);
+      --text: #e8f0fb;
+      --muted: #98a8bb;
+      --border: rgba(141, 168, 194, 0.24);
+      --accent: #6eb0cf;
+      --accent-2: #7ecfbc;
+      --danger: #ff9898;
+      --ok: #89d7a8;
+      --shadow: 0 22px 56px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(980px 420px at -4% -10%, rgba(162, 198, 225, 0.42), transparent 62%),
+        radial-gradient(780px 320px at 104% -8%, rgba(181, 208, 224, 0.36), transparent 64%),
+        radial-gradient(520px 220px at 50% 118%, rgba(179, 195, 213, 0.24), transparent 65%),
+        linear-gradient(180deg, var(--bg), #e8eef5);
+      line-height: 1.5;
+    }
+
+    [data-theme="dark"] body,
+    [data-theme="dark"] {
+      background: linear-gradient(180deg, #0d1622, #111c2b);
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: 26px 16px 70px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .brand-logo {
+      width: 220px;
+      height: auto;
+      display: block;
+    }
+
+    .brand-sub {
+      color: color-mix(in srgb, var(--muted), var(--text) 12%);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.18px;
+    }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 120ms ease, transform 120ms ease, background-color 120ms ease;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+    }
+
+    .btn:hover { border-color: color-mix(in srgb, var(--accent), #ffffff 25%); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
+    .btn.primary {
+      background: linear-gradient(145deg, color-mix(in srgb, var(--accent), #ffffff 10%), color-mix(in srgb, var(--accent-2), #ffffff 16%));
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .btn.ghost { background: transparent; }
+    .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger), var(--panel) 72%); }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 28%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(32px, 5.2vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -0.75px;
+      max-width: 780px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 780px;
+      font-size: 15px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .hero-pills {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-soft), #ffffff 20%);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 6px 10px;
+      font-weight: 600;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 24%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.2px;
+    }
+
+    .hint { color: var(--muted); font-size: 12px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin: 9px 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 20%);
+      color: var(--text);
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 82%);
+    }
+
+    .results {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--panel-soft), #ffffff 18%);
+      padding: 12px;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.4));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.4));
+    }
+
+    .big { margin: 0 0 5px; font-weight: 800; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .fine { color: var(--muted); font-size: 12px; }
+
+    .kpi {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .tile {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 14%);
+    }
+
+    .tile .label { color: var(--muted); font-size: 11px; }
+    .tile .value { margin-top: 4px; font-size: 15px; font-weight: 800; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    .timer-face {
+      margin-top: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      background: var(--panel);
+    }
+
+    .time {
+      font: 800 20px var(--mono);
+      letter-spacing: 0.3px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: var(--panel);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .t { font-weight: 800; }
+    .s { color: var(--muted); font-size: 12px; }
+
+    .support {
+      margin-top: 12px;
+      background: color-mix(in srgb, var(--panel-soft), #ffffff 14%);
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 26%);
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(34, 58, 83, 0.08);
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.55));
+    }
+
+    .support-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .support-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.36px;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--muted), var(--text) 14%);
+      font-weight: 700;
+    }
+
+    .support-line {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .support-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 14%);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--text);
+      background: color-mix(in srgb, var(--panel), #ffffff 20%);
+      text-decoration: none;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.35));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.35));
+    }
+
+    .support-link::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(140deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent), transparent 84%);
+    }
+
+    .support-link:hover {
+      border-color: color-mix(in srgb, var(--accent), #ffffff 22%);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    footer {
+      margin-top: 22px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ok { color: var(--ok); font-weight: 800; }
+    .warn { color: var(--danger); font-weight: 800; }
+
+    .report {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 16%);
+      padding: 11px;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+    }
+
+    .report h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .hidden-print { display: block; }
+
+    .tracker-card {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      min-height: auto;
+      padding: 12px 14px;
+    }
+
+    .tracker-card .section-title {
+      margin: 0 0 2px;
+    }
+
+    .tracker-card .fine {
+      margin: 0;
+      max-width: 520px;
+    }
+
+    .tracker-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 930px) {
+      .grid { grid-template-columns: 1fr; }
+      .tracker-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .row, .kpi { grid-template-columns: 1fr; }
+      .time { font-size: 19px; }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .hidden-print,
+      .topbar,
+      .hero-ctas,
+      .support,
+      footer {
+        display: none !important;
+      }
+      .wrap {
+        padding: 0;
+        max-width: 100%;
+      }
+      .hero,
+      .card {
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+      }
+      #reportCard {
+        page-break-inside: avoid;
+        border: 1px solid #cfd8e4;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" id="top">
+    <header class="topbar hidden-print">
+      <div class="brand" aria-label="CommutingValue">
+        <img class="brand-logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
+        <div class="brand-sub">True cost of commuting, session-private</div>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="tracker.html">Manual tracker</a>
+        <button class="btn ghost" id="themeBtn" type="button">Theme</button>
+        <button class="btn danger" id="resetBtn" type="button">Reset session data</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h1>See what your commute really costs in time, money, and life-hours.</h1>
+      <p>
+        Enter your daily commute time, distance, and cost assumptions.
+        Get a clear weekly and annual report you can share.
+        Data is stored in this browser session only.
+      </p>
+      <div class="hero-ctas hidden-print">
+        <button class="btn primary" type="button" id="scrollToCalc">Run calculator</button>
+        <a class="btn" href="tracker.html">Open manual tracker</a>
+        <button class="btn" type="button" id="demoBtn">Load demo values</button>
+      </div>
+      <div class="hero-pills">
+        <span class="pill">Session-only storage</span>
+        <span class="pill">No account</span>
+        <span class="pill">Distance helper links</span>
+        <span class="pill">PDF-ready report</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card" id="calc">
+        <div class="section-title">
+          <h2>Commuting value calculator</h2>
+          <div class="hint">Session-only estimate</div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="wage">Hourly wage (pre-tax)</label>
+            <input id="wage" type="number" min="0" inputmode="decimal" placeholder="e.g., 42" />
+          </div>
+          <div>
+            <label for="currency">Currency</label>
+            <select id="currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="NOK">NOK</option>
+              <option value="SEK">SEK</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="dailyCommuteMins">Daily commuting time (round-trip minutes)</label>
+            <input id="dailyCommuteMins" type="number" min="0" inputmode="numeric" placeholder="e.g., 70" />
+          </div>
+          <div>
+            <label for="daysPerWeek">Workdays commuting per week</label>
+            <input id="daysPerWeek" type="number" min="0" max="7" inputmode="numeric" placeholder="e.g., 4" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="distancePerDay">Daily commuting distance (round-trip km or miles)</label>
+            <input id="distancePerDay" type="number" min="0" inputmode="decimal" placeholder="e.g., 32" />
+          </div>
+          <div>
+            <label for="distanceUnit">Distance unit</label>
+            <select id="distanceUnit">
+              <option value="km">Kilometers (km)</option>
+              <option value="mi">Miles (mi)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="costPerDistanceUnit">Direct transport cost per km/mi</label>
+            <input id="costPerDistanceUnit" type="number" min="0" inputmode="decimal" placeholder="fuel, wear, fare equivalent" />
+          </div>
+          <div>
+            <label for="fixedMonthlyCost">Fixed monthly transport cost</label>
+            <input id="fixedMonthlyCost" type="number" min="0" inputmode="decimal" placeholder="pass, parking plan, insurance share" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="weeksPerYear">Weeks worked per year</label>
+            <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" placeholder="e.g., 46" />
+          </div>
+          <div>
+            <label for="transportMode">Primary transport mode (optional)</label>
+            <select id="transportMode">
+              <option value="">-</option>
+              <option>Walk</option>
+              <option>Bike</option>
+              <option>Bus</option>
+              <option>Train</option>
+              <option>Car</option>
+              <option>Mixed</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="divider hidden-print"></div>
+
+        <div class="section-title hidden-print" style="margin-bottom:8px;">
+          <h2>Distance helper</h2>
+          <div class="hint">Opens map routes in a new tab</div>
+        </div>
+        <div class="row hidden-print">
+          <div>
+            <label for="origin">Origin</label>
+            <input id="origin" type="text" placeholder="Home address or area" />
+          </div>
+          <div>
+            <label for="destination">Destination</label>
+            <input id="destination" type="text" placeholder="Work address or area" />
+          </div>
+        </div>
+        <div class="hero-ctas hidden-print" style="margin-top:10px;">
+          <button class="btn" id="openGoogleRoute" type="button">Open Google Maps route</button>
+          <button class="btn" id="openOSMRoute" type="button">Open OpenStreetMap route</button>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;" class="hidden-print">
+          <button class="btn primary" id="calcBtn" type="button">Calculate</button>
+          <button class="btn" id="shareBtn" type="button">Copy summary</button>
+          <button class="btn" id="pdfBtn" type="button">Export PDF report</button>
+        </div>
+
+        <div class="results" id="calcResults" style="display:none;">
+          <div class="big" id="headlineResult"></div>
+          <div class="muted" id="subResult"></div>
+          <div class="kpi">
+            <div class="tile">
+              <div class="label">Weekly commute time</div>
+              <div class="value" id="weeklyHours"></div>
+            </div>
+            <div class="tile">
+              <div class="label">Annual commute time</div>
+              <div class="value" id="annualHours"></div>
+            </div>
+            <div class="tile">
+              <div class="label">Annual distance</div>
+              <div class="value" id="annualDistance"></div>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="tile">
+              <div class="label">Annual time value</div>
+              <div class="value" id="annualTimeCost"></div>
+            </div>
+            <div class="tile">
+              <div class="label">Annual direct spend</div>
+              <div class="value" id="annualDirectCost"></div>
+            </div>
+            <div class="tile">
+              <div class="label">Annual total burden</div>
+              <div class="value" id="annualTotal"></div>
+            </div>
+          </div>
+        </div>
+
+        <article class="report" id="reportCard" style="display:none;">
+          <h3>CommutingValue report</h3>
+          <div class="fine" id="reportGeneratedAt"></div>
+          <div class="divider"></div>
+          <div id="reportBody" class="fine"></div>
+        </article>
+
+        <p class="fine" style="margin-top:10px;">
+          Privacy note: calculator and trip data are saved in <code>sessionStorage</code> and are cleared when the browser session ends.
+        </p>
+      </article>
+
+      <article class="card tracker-card hidden-print">
+        <div>
+          <div class="section-title">
+            <h2>Manual trip tracker</h2>
+            <div class="hint">Optional</div>
+          </div>
+          <p class="fine" style="font-size:12px;">
+            Track actual trips on a separate page with timer, weekly summary, and CSV export.
+          </p>
+        </div>
+        <div class="tracker-actions">
+          <a class="btn" href="tracker.html">Open tracker</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="support hidden-print">
+      <div class="support-copy">
+        <div class="support-eyebrow">Support</div>
+        <p class="support-line">If this helped you make a clearer choice, consider supporting the tool.</p>
+      </div>
+      <a class="support-link" href="https://buymeacoffee.com/commuting_value" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>
+    </section>
+
+    <footer class="hidden-print">
+      <div>
+        <div><strong>CommutingValue</strong> - transparent commuting cost estimates.</div>
+        <div class="fine">No signup. Session-only storage by default.</div>
+      </div>
+      <div style="display:flex; gap:13px; flex-wrap:wrap;">
+        <a href="tracker.html">Tracker</a>
+        <a href="info.html">Info</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms and Conditions</a>
+        <a href="#top">Back to top</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const STORE = sessionStorage;
+    const KEYS = {
+      theme: "cv_theme",
+      calc: "cv_calc",
+      trips: "cv_trips"
+    };
+
+    function loadJSON(key, fallback) {
+      try {
+        const raw = STORE.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveJSON(key, value) {
+      STORE.setItem(key, JSON.stringify(value));
+    }
+
+    function formatMoney(amount, currency) {
+      if (!Number.isFinite(amount)) return "-";
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      saveJSON(KEYS.theme, theme);
+    }
+
+    function initTheme() {
+      const saved = loadJSON(KEYS.theme, null);
+      if (saved) {
+        applyTheme(saved);
+        return;
+      }
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(prefersDark ? "dark" : "light");
+    }
+
+    function readCalcInputs() {
+      return {
+        wage: Number($("wage").value),
+        currency: $("currency").value,
+        dailyCommuteMins: Number($("dailyCommuteMins").value),
+        daysPerWeek: Number($("daysPerWeek").value),
+        distancePerDay: Number($("distancePerDay").value),
+        distanceUnit: $("distanceUnit").value,
+        costPerDistanceUnit: Number($("costPerDistanceUnit").value),
+        fixedMonthlyCost: Number($("fixedMonthlyCost").value),
+        weeksPerYear: Number($("weeksPerYear").value),
+        transportMode: $("transportMode").value || null
+      };
+    }
+
+    function validateInputs(v) {
+      const issues = [];
+      if (!(v.wage > 0)) issues.push("Hourly wage must be greater than 0.");
+      if (!(v.dailyCommuteMins >= 0)) issues.push("Daily commute minutes must be 0 or more.");
+      if (!(v.daysPerWeek >= 0 && v.daysPerWeek <= 7)) issues.push("Workdays per week must be 0-7.");
+      if (!(v.distancePerDay >= 0)) issues.push("Daily distance must be 0 or more.");
+      if (!(v.costPerDistanceUnit >= 0)) issues.push("Cost per distance unit must be 0 or more.");
+      if (!(v.fixedMonthlyCost >= 0)) issues.push("Fixed monthly cost must be 0 or more.");
+      if (!(v.weeksPerYear >= 0 && v.weeksPerYear <= 52)) issues.push("Weeks per year must be 0-52.");
+      return issues;
+    }
+
+    function compute(v) {
+      const weeklyHours = (v.dailyCommuteMins * v.daysPerWeek) / 60;
+      const annualHours = weeklyHours * v.weeksPerYear;
+
+      const annualDistance = v.distancePerDay * v.daysPerWeek * v.weeksPerYear;
+
+      const annualTimeCost = annualHours * v.wage;
+      const annualDistanceCost = annualDistance * v.costPerDistanceUnit;
+      const annualFixedCost = v.fixedMonthlyCost * 12;
+      const annualDirectCost = annualDistanceCost + annualFixedCost;
+      const annualTotal = annualTimeCost + annualDirectCost;
+
+      return {
+        weeklyHours,
+        annualHours,
+        annualDistance,
+        annualTimeCost,
+        annualDirectCost,
+        annualTotal,
+        monthlyTotal: annualTotal / 12
+      };
+    }
+
+    function renderResults(v, out) {
+      $("calcResults").style.display = "block";
+      $("headlineResult").textContent = `${out.weeklyHours.toFixed(1)} hours/week commuting`;
+      $("subResult").textContent = `Based on ${v.dailyCommuteMins} min/day, ${v.daysPerWeek} days/week, ${v.weeksPerYear} weeks/year.`;
+      $("weeklyHours").textContent = `${out.weeklyHours.toFixed(1)} h`;
+      $("annualHours").textContent = `${out.annualHours.toFixed(0)} h`;
+      $("annualDistance").textContent = `${out.annualDistance.toFixed(0)} ${v.distanceUnit}`;
+      $("annualTimeCost").textContent = formatMoney(out.annualTimeCost, v.currency);
+      $("annualDirectCost").textContent = formatMoney(out.annualDirectCost, v.currency);
+      $("annualTotal").textContent = formatMoney(out.annualTotal, v.currency);
+      renderReport(v, out);
+    }
+
+    function renderReport(v, out) {
+      $("reportCard").style.display = "block";
+      $("reportGeneratedAt").textContent = `Generated ${new Date().toLocaleString()}`;
+      $("reportBody").innerHTML = `
+        <strong>Summary</strong><br>
+        Weekly commute time: <strong>${out.weeklyHours.toFixed(1)} hours</strong><br>
+        Annual commute time: <strong>${out.annualHours.toFixed(0)} hours</strong><br>
+        Annual commute distance: <strong>${out.annualDistance.toFixed(0)} ${v.distanceUnit}</strong><br><br>
+        Annual time value: <strong>${formatMoney(out.annualTimeCost, v.currency)}</strong><br>
+        Annual direct spend: <strong>${formatMoney(out.annualDirectCost, v.currency)}</strong><br>
+        Annual total burden: <strong>${formatMoney(out.annualTotal, v.currency)}</strong><br>
+        Monthly average burden: <strong>${formatMoney(out.monthlyTotal, v.currency)}</strong>
+      `;
+    }
+
+    function persistCalc() {
+      saveJSON(KEYS.calc, readCalcInputs());
+    }
+
+    function loadCalc() {
+      const saved = loadJSON(KEYS.calc, null);
+      if (!saved) return;
+      $("wage").value = saved.wage ?? "";
+      $("currency").value = saved.currency ?? "USD";
+      $("dailyCommuteMins").value = saved.dailyCommuteMins ?? "";
+      $("daysPerWeek").value = saved.daysPerWeek ?? "";
+      $("distancePerDay").value = saved.distancePerDay ?? "";
+      $("distanceUnit").value = saved.distanceUnit ?? "km";
+      $("costPerDistanceUnit").value = saved.costPerDistanceUnit ?? "";
+      $("fixedMonthlyCost").value = saved.fixedMonthlyCost ?? "";
+      $("weeksPerYear").value = saved.weeksPerYear ?? "";
+      $("transportMode").value = saved.transportMode ?? "";
+    }
+
+    initTheme();
+    loadCalc();
+
+    $("themeBtn").addEventListener("click", () => {
+      const curr = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(curr === "dark" ? "light" : "dark");
+    });
+
+    $("scrollToCalc").addEventListener("click", () => {
+      $("calc").scrollIntoView({ behavior: "smooth" });
+    });
+
+    $("calcBtn").addEventListener("click", () => {
+      const v = readCalcInputs();
+      const issues = validateInputs(v);
+      if (issues.length) {
+        alert(`Please fix:\n\n${issues.join("\n")}`);
+        return;
+      }
+      const out = compute(v);
+      persistCalc();
+      renderResults(v, out);
+    });
+
+    $("shareBtn").addEventListener("click", async () => {
+      const v = readCalcInputs();
+      const issues = validateInputs(v);
+      if (issues.length) {
+        alert("Fill calculator inputs first.");
+        return;
+      }
+      const out = compute(v);
+      const text = `My commute costs about ${formatMoney(out.annualTotal, v.currency)} per year (${out.weeklyHours.toFixed(1)} hours/week, ${out.annualDistance.toFixed(0)} ${v.distanceUnit}/year). Calculated with CommutingValue.`;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Summary copied.");
+      } catch {
+        prompt("Copy this:", text);
+      }
+    });
+
+    $("pdfBtn").addEventListener("click", () => {
+      const v = readCalcInputs();
+      const issues = validateInputs(v);
+      if (issues.length) {
+        alert("Calculate first so the report has values.");
+        return;
+      }
+      const out = compute(v);
+      renderReport(v, out);
+      window.print();
+    });
+
+    function openRoute(urlBuilder) {
+      const origin = $("origin").value.trim();
+      const destination = $("destination").value.trim();
+      if (!origin || !destination) {
+        alert("Enter both origin and destination.");
+        return;
+      }
+      const url = urlBuilder(origin, destination);
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    $("openGoogleRoute").addEventListener("click", () => {
+      openRoute((origin, destination) => {
+        const o = encodeURIComponent(origin);
+        const d = encodeURIComponent(destination);
+        return `https://www.google.com/maps/dir/?api=1&origin=${o}&destination=${d}&travelmode=driving`;
+      });
+    });
+
+    $("openOSMRoute").addEventListener("click", () => {
+      openRoute((origin, destination) => {
+        const q = encodeURIComponent(`${origin} to ${destination}`);
+        return `https://www.openstreetmap.org/search?query=${q}`;
+      });
+    });
+
+    $("resetBtn").addEventListener("click", () => {
+      if (!confirm("Clear all session data?")) return;
+      STORE.removeItem(KEYS.calc);
+      STORE.removeItem(KEYS.trips);
+      [
+        "wage",
+        "dailyCommuteMins",
+        "daysPerWeek",
+        "distancePerDay",
+        "costPerDistanceUnit",
+        "fixedMonthlyCost",
+        "weeksPerYear",
+        "transportMode",
+        "origin",
+        "destination"
+      ].forEach((id) => { $(id).value = ""; });
+      $("currency").value = "USD";
+      $("distanceUnit").value = "km";
+      $("calcResults").style.display = "none";
+      $("reportCard").style.display = "none";
+      alert("Session data cleared.");
+    });
+
+    $("demoBtn").addEventListener("click", () => {
+      $("wage").value = "42";
+      $("currency").value = "USD";
+      $("dailyCommuteMins").value = "70";
+      $("daysPerWeek").value = "4";
+      $("distancePerDay").value = "32";
+      $("distanceUnit").value = "km";
+      $("costPerDistanceUnit").value = "0.38";
+      $("fixedMonthlyCost").value = "120";
+      $("weeksPerYear").value = "46";
+      $("transportMode").value = "Train";
+      $("origin").value = "Home";
+      $("destination").value = "Office";
+
+      $("calcBtn").click();
+      $("calc").scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>

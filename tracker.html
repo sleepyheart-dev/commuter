@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CommutingValue Tracker - Manual Trip Timer</title>
+  <meta name="description" content="Manual commute trip timer with weekly summary and CSV export. Data stored in sessionStorage." />
+  <meta name="theme-color" content="#0f2134" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://commutingvalue.com/tracker.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CommutingValue" />
+  <meta property="og:title" content="CommutingValue Tracker - Manual Trip Timer" />
+  <meta property="og:description" content="Manual commute trip timer with weekly summary and CSV export." />
+  <meta property="og:url" content="https://commutingvalue.com/tracker.html" />
+  <meta property="og:image" content="https://commutingvalue.com/assets/logo-wordmark.svg" />
+  <meta property="og:image:alt" content="CommutingValue minimalist wordmark" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CommutingValue Tracker - Manual Trip Timer" />
+  <meta name="twitter:description" content="Track commute legs manually and export data." />
+  <meta name="twitter:image" content="https://commutingvalue.com/assets/logo-wordmark.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <style>
+    :root {
+      --bg: #edf2f8;
+      --panel: rgba(255, 255, 255, 0.68);
+      --panel-soft: rgba(255, 255, 255, 0.54);
+      --text: #142435;
+      --muted: #5d6f82;
+      --border: rgba(255, 255, 255, 0.62);
+      --accent: #1f4a67;
+      --accent-2: #3f7f88;
+      --danger: #9f2f2f;
+      --ok: #1f6b42;
+      --shadow: 0 20px 54px rgba(34, 58, 83, 0.14);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --glass-blur: 18px;
+      --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0e1825;
+      --panel: rgba(23, 36, 52, 0.62);
+      --panel-soft: rgba(18, 30, 44, 0.56);
+      --text: #e8f0fb;
+      --muted: #98a8bb;
+      --border: rgba(141, 168, 194, 0.24);
+      --accent: #6eb0cf;
+      --accent-2: #7ecfbc;
+      --danger: #ff9898;
+      --ok: #89d7a8;
+      --shadow: 0 22px 56px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(980px 420px at -4% -10%, rgba(162, 198, 225, 0.42), transparent 62%),
+        radial-gradient(780px 320px at 104% -8%, rgba(181, 208, 224, 0.36), transparent 64%),
+        radial-gradient(520px 220px at 50% 118%, rgba(179, 195, 213, 0.24), transparent 65%),
+        linear-gradient(180deg, var(--bg), #e8eef5);
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 26px 16px 74px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .brand-logo {
+      width: 220px;
+      height: auto;
+      display: block;
+    }
+
+    .brand-sub { color: color-mix(in srgb, var(--muted), var(--text) 12%); font-size: 12px; font-weight: 600; letter-spacing: 0.18px; }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 120ms ease, transform 120ms ease, background-color 120ms ease;
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+    }
+
+    .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
+    .btn.primary { background: linear-gradient(145deg, color-mix(in srgb, var(--accent), #ffffff 10%), color-mix(in srgb, var(--accent-2), #ffffff 16%)); border-color: transparent; color: #fff; }
+    .btn.ghost { background: transparent; }
+    .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger), var(--panel) 72%); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 24%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-title h1,
+    .section-title h2 {
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .section-title h1 { font-size: 28px; }
+    .section-title h2 { font-size: 19px; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .fine { color: var(--muted); font-size: 12px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin: 9px 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 20%);
+      color: var(--text);
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 82%);
+    }
+
+    .timer-face {
+      margin-top: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid color-mix(in srgb, var(--border), #ffffff 22%);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 14%);
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.45));
+    }
+
+    .time { font: 800 20px var(--mono); letter-spacing: 0.3px; }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel-soft), #ffffff 20%);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+    .kpi {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .tile {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 14%);
+    }
+
+    .tile .label { color: var(--muted); font-size: 11px; }
+    .tile .value { margin-top: 4px; font-size: 15px; font-weight: 800; }
+
+    .list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 14%);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .t { font-weight: 800; }
+    .s { color: var(--muted); font-size: 12px; }
+
+    footer {
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 700px) {
+      .row, .kpi { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" id="top">
+    <header class="topbar">
+      <div class="brand" aria-label="CommutingValue">
+        <img class="brand-logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
+        <div class="brand-sub">Manual tracker</div>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="index.html">Calculator</a>
+        <button class="btn ghost" id="themeBtn" type="button">Theme</button>
+        <button class="btn danger" id="resetTripsBtn" type="button">Reset trips</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="section-title">
+        <h1>Manual trip tracker</h1>
+        <div class="hint">Session-only storage</div>
+      </div>
+      <p class="fine" style="font-size:13px; margin-top:0;">
+        Start and stop the timer for each commute leg. Trips are stored in this browser session only.
+      </p>
+
+      <div class="row">
+        <div>
+          <label for="mode">Transport mode</label>
+          <select id="mode">
+            <option>Walk</option>
+            <option>Bike</option>
+            <option>Bus</option>
+            <option>Train</option>
+            <option selected>Car</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="tripDirectCost">Direct trip spend (optional)</label>
+          <input id="tripDirectCost" type="number" min="0" step="0.01" inputmode="decimal" placeholder="fare, toll, parking" />
+        </div>
+      </div>
+
+      <div class="timer-face" aria-live="polite">
+        <div>
+          <div class="time" id="timerDisplay">00:00:00</div>
+          <div class="fine" id="timerState">Ready</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tag" id="timerModeTag">Mode: Car</div>
+          <div class="fine" id="timerStartedAt"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+        <button class="btn primary" id="startBtn" type="button">Start</button>
+        <button class="btn" id="stopBtn" type="button" disabled>Stop</button>
+        <button class="btn" id="saveBtn" type="button" disabled>Save trip</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title" style="margin:0;">
+        <h2>This week</h2>
+        <div class="hint" id="weekLabel"></div>
+      </div>
+
+      <div class="kpi" style="margin-top:10px;">
+        <div class="tile">
+          <div class="label">Trips logged</div>
+          <div class="value" id="weekTrips">0</div>
+        </div>
+        <div class="tile">
+          <div class="label">Commute time</div>
+          <div class="value" id="weekTime">0 min</div>
+        </div>
+        <div class="tile">
+          <div class="label">Estimated burden</div>
+          <div class="value" id="weekValue">-</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title" id="history" style="margin:0;">
+        <h2>Trip history</h2>
+        <div class="hint"><button class="btn" id="exportBtn" type="button">Copy CSV</button></div>
+      </div>
+      <div class="list" id="tripList"></div>
+    </section>
+
+    <footer>
+      <div>
+        <div><strong>CommutingValue</strong> - manual trip tracker.</div>
+        <div class="fine">Session-only storage by default.</div>
+      </div>
+      <div style="display:flex; gap:13px; flex-wrap:wrap;">
+        <a href="index.html">Calculator</a>
+        <a href="info.html">Info</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms and Conditions</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const STORE = sessionStorage;
+    const KEYS = {
+      theme: "cv_theme",
+      calc: "cv_calc",
+      trips: "cv_trips"
+    };
+
+    const TIMER = {
+      interval: null,
+      startMs: null
+    };
+
+    function loadJSON(key, fallback) {
+      try {
+        const raw = STORE.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveJSON(key, value) {
+      STORE.setItem(key, JSON.stringify(value));
+    }
+
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    function msToHMS(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      return `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+
+    function formatMoney(amount, currency) {
+      if (!Number.isFinite(amount)) return "-";
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function isoWeekInfo(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const day = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - day);
+      const year = d.getUTCFullYear();
+      const yearStart = new Date(Date.UTC(year, 0, 1));
+      const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      return { year, week };
+    }
+
+    function isSameISOWeek(a, b) {
+      const wa = isoWeekInfo(a);
+      const wb = isoWeekInfo(b);
+      return wa.year === wb.year && wa.week === wb.week;
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      saveJSON(KEYS.theme, theme);
+    }
+
+    function initTheme() {
+      const saved = loadJSON(KEYS.theme, null);
+      if (saved) {
+        applyTheme(saved);
+        return;
+      }
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(prefersDark ? "dark" : "light");
+    }
+
+    function readCalcInputs() {
+      const saved = loadJSON(KEYS.calc, {});
+      return {
+        wage: Number(saved.wage || 0),
+        currency: saved.currency || "USD"
+      };
+    }
+
+    function getTrips() {
+      return loadJSON(KEYS.trips, []);
+    }
+
+    function setTrips(trips) {
+      saveJSON(KEYS.trips, trips);
+    }
+
+    function setTimerUI(state) {
+      if (state === "ready") {
+        $("timerState").textContent = "Ready";
+        $("startBtn").disabled = false;
+        $("stopBtn").disabled = true;
+        $("saveBtn").disabled = true;
+        $("timerStartedAt").textContent = "";
+      }
+      if (state === "running") {
+        $("timerState").textContent = "Running...";
+        $("startBtn").disabled = true;
+        $("stopBtn").disabled = false;
+        $("saveBtn").disabled = true;
+      }
+      if (state === "stopped") {
+        $("timerState").textContent = "Stopped - save this trip?";
+        $("startBtn").disabled = false;
+        $("stopBtn").disabled = true;
+        $("saveBtn").disabled = false;
+      }
+    }
+
+    function updateModeTag() {
+      $("timerModeTag").textContent = `Mode: ${$("mode").value}`;
+    }
+
+    function tickTimer() {
+      if (!TIMER.startMs) return;
+      const elapsed = Date.now() - TIMER.startMs;
+      $("timerDisplay").textContent = msToHMS(elapsed);
+    }
+
+    function renderTripList() {
+      const trips = getTrips();
+      const box = $("tripList");
+      box.innerHTML = "";
+      if (!trips.length) {
+        box.innerHTML = '<div class="fine">No trips yet.</div>';
+        return;
+      }
+
+      const calc = readCalcInputs();
+      for (const t of trips.slice(0, 100)) {
+        const dt = new Date(t.createdAt);
+        const mins = t.durationMin || 0;
+        const burden = calc.wage > 0 ? ((mins / 60) * calc.wage + (Number(t.directCost) || 0)) : (Number(t.directCost) || 0);
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div>
+            <div class="t">${t.mode} <span class="s">- ${dt.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} - ${dt.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span></div>
+            <div class="s">${mins.toFixed(1)} min${t.directCost ? ` - direct ${formatMoney(Number(t.directCost), calc.currency)}` : ""}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="t">${burden > 0 ? formatMoney(burden, calc.currency) : "-"}</div>
+            <button class="btn ghost" type="button" data-del="${t.id}">Delete</button>
+          </div>
+        `;
+        box.appendChild(el);
+      }
+
+      box.querySelectorAll("[data-del]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (!confirm("Delete this trip?")) return;
+          const id = btn.getAttribute("data-del");
+          setTrips(getTrips().filter((x) => x.id !== id));
+          renderTripList();
+          updateWeekSummary();
+        });
+      });
+    }
+
+    function updateWeekLabel() {
+      const info = isoWeekInfo(new Date());
+      $("weekLabel").textContent = `ISO week ${info.week}, ${info.year}`;
+    }
+
+    function updateWeekSummary() {
+      const now = new Date();
+      const weekTrips = getTrips().filter((t) => isSameISOWeek(new Date(t.createdAt), now));
+      const totalMin = weekTrips.reduce((acc, t) => acc + (t.durationMin || 0), 0);
+      const totalHours = totalMin / 60;
+
+      $("weekTrips").textContent = String(weekTrips.length);
+      $("weekTime").textContent = totalHours >= 1 ? `${totalHours.toFixed(1)} h` : `${totalMin.toFixed(0)} min`;
+
+      const calc = readCalcInputs();
+      const direct = weekTrips.reduce((acc, t) => acc + (Number(t.directCost) || 0), 0);
+      if (calc.wage > 0) {
+        const burden = totalHours * calc.wage + direct;
+        $("weekValue").textContent = formatMoney(burden, calc.currency);
+      } else if (direct > 0) {
+        $("weekValue").textContent = formatMoney(direct, calc.currency);
+      } else {
+        $("weekValue").textContent = "-";
+      }
+    }
+
+    initTheme();
+    updateModeTag();
+    updateWeekLabel();
+    renderTripList();
+    updateWeekSummary();
+
+    $("themeBtn").addEventListener("click", () => {
+      const curr = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(curr === "dark" ? "light" : "dark");
+    });
+
+    $("mode").addEventListener("change", updateModeTag);
+
+    $("startBtn").addEventListener("click", () => {
+      if (TIMER.interval) clearInterval(TIMER.interval);
+      TIMER.startMs = Date.now();
+      $("timerDisplay").textContent = "00:00:00";
+      $("timerStartedAt").textContent = `Started: ${new Date(TIMER.startMs).toLocaleTimeString()}`;
+      setTimerUI("running");
+      TIMER.interval = setInterval(tickTimer, 250);
+    });
+
+    $("stopBtn").addEventListener("click", () => {
+      if (!TIMER.interval) return;
+      clearInterval(TIMER.interval);
+      TIMER.interval = null;
+      tickTimer();
+      setTimerUI("stopped");
+    });
+
+    $("saveBtn").addEventListener("click", () => {
+      if (!TIMER.startMs) return;
+      const endMs = Date.now();
+      const durationMs = Math.max(0, endMs - TIMER.startMs);
+      if (durationMs < 15000 && !confirm("Trip is under 15 seconds. Save anyway?")) return;
+
+      const trip = {
+        id: globalThis.crypto?.randomUUID?.() || String(Math.random()).slice(2),
+        createdAt: new Date().toISOString(),
+        startMs: TIMER.startMs,
+        endMs,
+        durationMs,
+        durationMin: durationMs / 60000,
+        mode: $("mode").value,
+        directCost: Number($("tripDirectCost").value) || 0
+      };
+
+      setTrips([trip, ...getTrips()]);
+      TIMER.startMs = null;
+      $("tripDirectCost").value = "";
+      $("timerDisplay").textContent = "00:00:00";
+      setTimerUI("ready");
+      renderTripList();
+      updateWeekSummary();
+    });
+
+    $("exportBtn").addEventListener("click", async () => {
+      const trips = getTrips();
+      if (!trips.length) {
+        alert("No trips to export.");
+        return;
+      }
+      const header = ["createdAt", "mode", "durationMin", "directCost"];
+      const rows = trips.map((t) => [t.createdAt, t.mode, (t.durationMin || 0).toFixed(2), (Number(t.directCost) || 0).toFixed(2)]);
+      const csv = [header.join(","), ...rows.map((r) => r.map((x) => `"${String(x).replaceAll('"', '""')}"`).join(","))].join("\n");
+      try {
+        await navigator.clipboard.writeText(csv);
+        alert("CSV copied.");
+      } catch {
+        prompt("Copy CSV:", csv);
+      }
+    });
+
+    $("resetTripsBtn").addEventListener("click", () => {
+      if (!confirm("Clear all tracked trips in this session?")) return;
+      STORE.removeItem(KEYS.trips);
+      if (TIMER.interval) {
+        clearInterval(TIMER.interval);
+        TIMER.interval = null;
+      }
+      TIMER.startMs = null;
+      $("tripDirectCost").value = "";
+      $("timerDisplay").textContent = "00:00:00";
+      setTimerUI("ready");
+      renderTripList();
+      updateWeekSummary();
+      alert("Session trips cleared.");
+    });
+  </script>
+</body>
+</html>
