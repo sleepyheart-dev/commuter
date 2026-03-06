@@ -430,6 +430,47 @@
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 82%);
     }
 
+    input:disabled, select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      padding: 4px;
+      min-width: 136px;
+    }
+
+    .step-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+      background: color-mix(in srgb, var(--panel), #ffffff 24%);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .step-btn:hover {
+      border-color: color-mix(in srgb, var(--accent), #ffffff 28%);
+    }
+
+    .step-value {
+      min-width: 18px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+    }
+
     .results {
       margin-top: 12px;
       border: 1px dashed var(--border);
@@ -803,17 +844,47 @@
         </div>
 
         <div class="row">
+          <div id="scopeModeBlock">
+            <label id="labelScopeMode" for="scopeMode">Calculation scope</label>
+            <select id="scopeMode">
+              <option value="self">Just me</option>
+              <option value="household">Household (adults)</option>
+            </select>
+          </div>
+          <div id="householdAdultsBlock">
+            <label id="labelHouseholdSizeMode" for="householdSizeMode">Household setup</label>
+            <select id="householdSizeMode">
+              <option value="one">One adult</option>
+              <option value="multi">More than one adult</option>
+            </select>
+            <p class="fine" id="householdSizeHint" style="margin-top:6px; margin-bottom:8px;">
+              Start with one adult, then add more only if needed.
+            </p>
+            <label id="labelHouseholdAdults" for="householdAdults">Adults included</label>
+            <div class="stepper" id="householdAdultsStepper" role="group" aria-label="Adults included">
+              <button class="step-btn" id="adultsMinus" type="button" aria-label="Decrease adults">-</button>
+              <div class="step-value" id="householdAdultsLabel">1</div>
+              <button class="step-btn" id="adultsPlus" type="button" aria-label="Increase adults">+</button>
+            </div>
+            <input id="householdAdults" type="number" min="1" max="12" inputmode="numeric" value="1" hidden />
+          </div>
+        </div>
+        <p class="fine" id="scopeHint" style="margin-top:8px;">
+          Household mode applies the same commute profile to each included adult.
+        </p>
+
+        <div class="row">
           <div>
             <label id="labelWageMode" for="wageMode">Wage input mode</label>
             <select id="wageMode">
+              <option value="yearly">Yearly salary</option>
               <option value="hourly">Hourly pay</option>
               <option value="monthly">Monthly salary</option>
-              <option value="yearly">Yearly salary</option>
             </select>
           </div>
           <div>
             <label id="labelWageAmount" for="wageAmount">Wage amount (pre-tax)</label>
-            <input id="wageAmount" type="number" min="0" inputmode="decimal" placeholder="e.g., 42" />
+            <input id="wageAmount" type="number" min="0" inputmode="decimal" placeholder="e.g., 82000" />
           </div>
         </div>
 
@@ -821,6 +892,7 @@
           <div>
             <label id="labelWorkHoursWeek" for="workHoursPerWeek">Work hours per week</label>
             <input id="workHoursPerWeek" type="number" min="0" max="168" inputmode="decimal" placeholder="e.g., 37.5" />
+            <p class="fine" id="workHoursHint" style="margin-top:6px;">Required when using monthly or yearly salary.</p>
           </div>
           <div>
             <label id="labelCurrency" for="currency">Currency</label>
@@ -843,14 +915,14 @@
           </div>
           <div>
             <label id="labelDaysWeek" for="daysPerWeek">Workdays commuting per week</label>
-            <input id="daysPerWeek" type="number" min="0" max="7" inputmode="numeric" placeholder="e.g., 4" />
+            <input id="daysPerWeek" type="number" min="0" max="7" inputmode="numeric" value="5" placeholder="e.g., 4" />
           </div>
         </div>
 
         <div class="row">
           <div>
             <label id="labelWeeksYear" for="weeksPerYear">Weeks worked per year</label>
-            <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" placeholder="e.g., 46" />
+            <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" value="46" placeholder="e.g., 46" />
           </div>
           <div>
             <label id="labelTransportMode" for="transportMode">Primary transport mode (optional)</label>
@@ -896,6 +968,27 @@
             <input id="fixedMonthlyCost" type="number" min="0" inputmode="decimal" placeholder="pass, parking plan, insurance share" />
           </div>
         </div>
+
+        <div class="section-title" style="margin-top:12px; margin-bottom:8px;">
+          <h2 id="housingLensTitle">How much housing is this?</h2>
+          <div class="hint" id="housingLensHint">Optional rent and mortgage lens</div>
+        </div>
+        <div class="row">
+          <div>
+            <label id="labelHousingLensEnabled" for="housingLensEnabled">Housing comparison</label>
+            <select id="housingLensEnabled">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </div>
+          <div>
+            <label id="labelMortgageRate" for="mortgageRate">Mortgage interest rate (%)</label>
+            <input id="mortgageRate" type="number" min="0" max="25" step="0.1" inputmode="decimal" placeholder="e.g., 5.0" />
+          </div>
+        </div>
+        <p class="fine" id="housingLensNote" style="margin-top:8px;">
+          Uses a 30-year amortized mortgage approximation from the monthly commute burden.
+        </p>
 
         <div class="divider hidden-print"></div>
 
@@ -963,6 +1056,20 @@
             <div class="tile">
               <div class="label" id="kpiAnnualTotal">Annual total burden</div>
               <div class="value" id="annualTotal"></div>
+            </div>
+          </div>
+          <div class="kpi" id="housingKpiRow" style="display:none;">
+            <div class="tile">
+              <div class="label" id="kpiRentEquivalent">Rent equivalent (monthly)</div>
+              <div class="value" id="rentEquivalent"></div>
+            </div>
+            <div class="tile">
+              <div class="label" id="kpiMortgageEquivalent">Mortgage equivalent (30-year principal)</div>
+              <div class="value" id="mortgageEquivalent"></div>
+            </div>
+            <div class="tile">
+              <div class="label" id="kpiAdultsApplied">Adults included</div>
+              <div class="value" id="adultsApplied"></div>
             </div>
           </div>
         </div>
@@ -1061,6 +1168,7 @@
         labelWageMode: "Wage input mode",
         labelWageAmount: "Wage amount (pre-tax)",
         labelWorkHoursWeek: "Work hours per week",
+        workHoursHint: "Required when using monthly or yearly salary.",
         wageModeHourly: "Hourly pay",
         wageModeMonthly: "Monthly salary",
         wageModeYearly: "Yearly salary",
@@ -1074,6 +1182,22 @@
         labelFixedMonthly: "Fixed monthly transport cost",
         labelWeeksYear: "Weeks worked per year",
         labelTransportMode: "Primary transport mode (optional)",
+        labelScopeMode: "Calculation scope",
+        labelHouseholdSizeMode: "Household setup",
+        householdSizeHint: "Start with one adult, then add more only if needed.",
+        householdSizeOne: "One adult",
+        householdSizeMulti: "More than one adult",
+        labelHouseholdAdults: "Adults included",
+        scopeHint: "Household mode applies the same commute profile to each included adult.",
+        scopeSelf: "Just me",
+        scopeHousehold: "Household (adults)",
+        housingLensTitle: "How much housing is this?",
+        housingLensHint: "Optional rent and mortgage lens",
+        labelHousingLensEnabled: "Housing comparison",
+        housingLensOff: "Off",
+        housingLensOn: "On",
+        labelMortgageRate: "Mortgage interest rate (%)",
+        housingLensNote: "Uses a 30-year amortized mortgage approximation from the monthly commute burden.",
         distanceHelperTitle: "Distance helper",
         distanceHelperHint: "Optional. Use this only if you want help estimating distance.",
         labelOrigin: "Origin",
@@ -1099,6 +1223,9 @@
         kpiAnnualTimeValue: "Annual time value",
         kpiAnnualDirect: "Annual direct spend",
         kpiAnnualTotal: "Annual total burden",
+        kpiRentEquivalent: "Rent equivalent (monthly)",
+        kpiMortgageEquivalent: "Mortgage equivalent (30-year principal)",
+        kpiAdultsApplied: "Adults included",
         reportTitle: "CommutingValue report",
         privacyNote: "Privacy note: calculator and trip data are saved in <code>sessionStorage</code> and are cleared when the browser session ends.",
         trackerCardTitle: "Manual tracker",
@@ -1125,7 +1252,7 @@
         modeCar: "Car",
         modeMixed: "Mixed",
         modeOther: "Other",
-        phWageAmount: "e.g., 42",
+        phWageAmount: "e.g., 82000",
         phWorkHoursWeek: "e.g., 37.5",
         phDailyMins: "e.g., 70",
         phDaysWeek: "e.g., 4",
@@ -1133,6 +1260,8 @@
         phCostUnit: "fuel, wear, fare equivalent",
         phFixedMonthly: "pass, parking plan, insurance share",
         phWeeksYear: "e.g., 46",
+        phHouseholdAdults: "e.g., 2",
+        phMortgageRate: "e.g., 5.0",
         phOrigin: "Home address or area",
         phDestination: "Work address or area",
         errWageAmount: "Wage amount must be greater than 0.",
@@ -1144,6 +1273,8 @@
         errCostUnit: "Cost per distance unit must be 0 or more.",
         errFixedMonthly: "Fixed monthly cost must be 0 or more.",
         errWeeksYear: "Weeks per year must be 0-52.",
+        errHouseholdAdults: "Adults included must be between 1 and 12.",
+        errMortgageRate: "Mortgage interest rate must be between 0 and 25.",
         alertFix: "Please fix:",
         resultHeadline: "{hours} hours/week commuting",
         resultSub: "Based on {mins} min/day, {days} days/week, {weeks} weeks/year.",
@@ -1156,9 +1287,19 @@
         reportAnnualTime: "Annual commute time",
         reportAnnualDistance: "Annual commute distance",
         reportAnnualTimeValue: "Annual time value",
+        reportAnnualIndirect: "Annual indirect cost (time/opportunity)",
         reportAnnualDirect: "Annual direct spend",
+        reportDirectDistance: "Direct variable distance cost",
+        reportDirectFixed: "Direct fixed transport cost",
         reportAnnualTotal: "Annual total burden",
         reportMonthlyAverage: "Monthly average burden",
+        reportScope: "Scope",
+        reportAdultsIncluded: "Adults included",
+        reportHousingSection: "Housing lens (optional)",
+        reportRentEquivalent: "Equivalent monthly rent budget",
+        reportMortgageEquivalent: "Equivalent mortgage principal (30-year)",
+        reportMortgageRate: "Mortgage rate assumption",
+        reportHouseholdAssumption: "Assumes the same commute profile for each included adult.",
         alertFillFirst: "Fill calculator inputs first.",
         shareText: "My commute costs about {annualTotal} per year ({weeklyHours} hours/week, {annualDistance} {distanceUnit}/year). Calculated with CommutingValue.",
         alertSummaryCopied: "Summary copied.",
@@ -1170,7 +1311,8 @@
         alertCleared: "Session data cleared.",
         derivedHourlyHint: "Calculated hourly wage: {hourly}",
         derivedHourlyNeedInput: "Calculated hourly wage: enter wage amount.",
-        derivedHourlyNeedHours: "Calculated hourly wage: enter work hours/week for salary conversion."
+        derivedHourlyNeedHours: "Calculated hourly wage: enter work hours/week for salary conversion.",
+        derivedHourlyAssumed: "Calculated hourly wage (assumes {hours} h/week): {hourly}"
       },
       es: {
         pageTitle: "CommutingValue - Costo real de tu desplazamiento",
@@ -1193,6 +1335,7 @@
         labelWageMode: "Modo de ingreso salarial",
         labelWageAmount: "Importe salarial (antes de impuestos)",
         labelWorkHoursWeek: "Horas de trabajo por semana",
+        workHoursHint: "Obligatorio cuando uses salario mensual o anual.",
         wageModeHourly: "Pago por hora",
         wageModeMonthly: "Salario mensual",
         wageModeYearly: "Salario anual",
@@ -1206,6 +1349,22 @@
         labelFixedMonthly: "Coste fijo mensual de transporte",
         labelWeeksYear: "Semanas trabajadas al año",
         labelTransportMode: "Modo principal de transporte (opcional)",
+        labelScopeMode: "Alcance del cálculo",
+        labelHouseholdSizeMode: "Configuración del hogar",
+        householdSizeHint: "Empieza con un adulto y añade más solo si hace falta.",
+        householdSizeOne: "Un adulto",
+        householdSizeMulti: "Más de un adulto",
+        labelHouseholdAdults: "Adultos incluidos",
+        scopeHint: "El modo hogar aplica el mismo perfil de desplazamiento a cada adulto incluido.",
+        scopeSelf: "Solo yo",
+        scopeHousehold: "Hogar (adultos)",
+        housingLensTitle: "¿Cuánta vivienda representa esto?",
+        housingLensHint: "Lente opcional de alquiler e hipoteca",
+        labelHousingLensEnabled: "Comparación de vivienda",
+        housingLensOff: "Desactivado",
+        housingLensOn: "Activado",
+        labelMortgageRate: "Tipo de interés hipotecario (%)",
+        housingLensNote: "Usa una aproximación de hipoteca a 30 años desde la carga mensual de desplazamiento.",
         distanceHelperTitle: "Asistente de distancia",
         distanceHelperHint: "Opcional. Úsalo solo si quieres ayuda para estimar distancia.",
         labelOrigin: "Origen",
@@ -1231,6 +1390,9 @@
         kpiAnnualTimeValue: "Valor anual del tiempo",
         kpiAnnualDirect: "Gasto directo anual",
         kpiAnnualTotal: "Carga total anual",
+        kpiRentEquivalent: "Alquiler equivalente (mensual)",
+        kpiMortgageEquivalent: "Hipoteca equivalente (principal a 30 años)",
+        kpiAdultsApplied: "Adultos incluidos",
         reportTitle: "Informe de CommutingValue",
         privacyNote: "Nota de privacidad: los datos de calculadora y trayectos se guardan en <code>sessionStorage</code> y se eliminan al finalizar la sesión del navegador.",
         trackerCardTitle: "Rastreador manual",
@@ -1257,7 +1419,7 @@
         modeCar: "Coche",
         modeMixed: "Mixto",
         modeOther: "Otro",
-        phWageAmount: "p. ej., 42",
+        phWageAmount: "p. ej., 82000",
         phWorkHoursWeek: "p. ej., 37.5",
         phDailyMins: "p. ej., 70",
         phDaysWeek: "p. ej., 4",
@@ -1265,6 +1427,8 @@
         phCostUnit: "combustible, desgaste, tarifa",
         phFixedMonthly: "abono, parking, seguro",
         phWeeksYear: "p. ej., 46",
+        phHouseholdAdults: "p. ej., 2",
+        phMortgageRate: "p. ej., 5.0",
         phOrigin: "Dirección o zona de casa",
         phDestination: "Dirección o zona de trabajo",
         errWageAmount: "El importe salarial debe ser mayor que 0.",
@@ -1276,6 +1440,8 @@
         errCostUnit: "El coste por unidad debe ser 0 o más.",
         errFixedMonthly: "El coste mensual fijo debe ser 0 o más.",
         errWeeksYear: "Las semanas por año deben estar entre 0 y 52.",
+        errHouseholdAdults: "Los adultos incluidos deben estar entre 1 y 12.",
+        errMortgageRate: "El tipo hipotecario debe estar entre 0 y 25.",
         alertFix: "Corrige lo siguiente:",
         resultHeadline: "{hours} horas/semana de desplazamiento",
         resultSub: "Basado en {mins} min/día, {days} días/semana, {weeks} semanas/año.",
@@ -1288,9 +1454,19 @@
         reportAnnualTime: "Tiempo anual de desplazamiento",
         reportAnnualDistance: "Distancia anual de desplazamiento",
         reportAnnualTimeValue: "Valor anual del tiempo",
+        reportAnnualIndirect: "Coste anual indirecto (tiempo/oportunidad)",
         reportAnnualDirect: "Gasto directo anual",
+        reportDirectDistance: "Coste directo variable por distancia",
+        reportDirectFixed: "Coste directo fijo de transporte",
         reportAnnualTotal: "Carga total anual",
         reportMonthlyAverage: "Carga media mensual",
+        reportScope: "Alcance",
+        reportAdultsIncluded: "Adultos incluidos",
+        reportHousingSection: "Lente de vivienda (opcional)",
+        reportRentEquivalent: "Presupuesto de alquiler equivalente mensual",
+        reportMortgageEquivalent: "Principal hipotecario equivalente (30 años)",
+        reportMortgageRate: "Supuesto de tipo hipotecario",
+        reportHouseholdAssumption: "Supone el mismo perfil de desplazamiento para cada adulto incluido.",
         alertFillFirst: "Primero completa la calculadora.",
         shareText: "Mi desplazamiento cuesta aprox. {annualTotal} al año ({weeklyHours} horas/semana, {annualDistance} {distanceUnit}/año). Calculado con CommutingValue.",
         alertSummaryCopied: "Resumen copiado.",
@@ -1302,7 +1478,8 @@
         alertCleared: "Datos de sesión borrados.",
         derivedHourlyHint: "Salario por hora calculado: {hourly}",
         derivedHourlyNeedInput: "Salario por hora calculado: introduce el importe salarial.",
-        derivedHourlyNeedHours: "Salario por hora calculado: introduce horas/semana para convertir salario."
+        derivedHourlyNeedHours: "Salario por hora calculado: introduce horas/semana para convertir salario.",
+        derivedHourlyAssumed: "Salario por hora calculado (asume {hours} h/semana): {hourly}"
       },
       zh: {
         pageTitle: "CommutingValue - 通勤真实成本计算器",
@@ -1325,6 +1502,7 @@
         labelWageMode: "工资输入方式",
         labelWageAmount: "工资金额（税前）",
         labelWorkHoursWeek: "每周工作小时",
+        workHoursHint: "使用月薪或年薪时为必填。",
         wageModeHourly: "时薪",
         wageModeMonthly: "月薪",
         wageModeYearly: "年薪",
@@ -1338,6 +1516,22 @@
         labelFixedMonthly: "每月固定交通成本",
         labelWeeksYear: "每年工作周数",
         labelTransportMode: "主要通勤方式（可选）",
+        labelScopeMode: "计算范围",
+        labelHouseholdSizeMode: "家庭设置",
+        householdSizeHint: "先从 1 位成年人开始，只有需要时再增加。",
+        householdSizeOne: "1 位成年人",
+        householdSizeMulti: "多于 1 位成年人",
+        labelHouseholdAdults: "纳入的成年人数量",
+        scopeHint: "家庭模式会将同一通勤画像应用到每位纳入的成年人。",
+        scopeSelf: "仅自己",
+        scopeHousehold: "家庭（成年人）",
+        housingLensTitle: "这相当于多少住房成本？",
+        housingLensHint: "可选：租金与房贷视角",
+        labelHousingLensEnabled: "住房比较",
+        housingLensOff: "关闭",
+        housingLensOn: "开启",
+        labelMortgageRate: "房贷利率 (%)",
+        housingLensNote: "根据每月通勤负担，按30年等额本息近似换算。",
         distanceHelperTitle: "距离助手",
         distanceHelperHint: "可选。仅在你需要估算距离时使用。",
         labelOrigin: "起点",
@@ -1363,6 +1557,9 @@
         kpiAnnualTimeValue: "每年时间价值",
         kpiAnnualDirect: "每年直接支出",
         kpiAnnualTotal: "每年总负担",
+        kpiRentEquivalent: "等效租金（月）",
+        kpiMortgageEquivalent: "等效房贷本金（30年）",
+        kpiAdultsApplied: "纳入成年人",
         reportTitle: "CommutingValue 报告",
         privacyNote: "隐私说明：计算器和行程数据默认保存在 <code>sessionStorage</code>，浏览器会话结束后会清除。",
         trackerCardTitle: "手动追踪器",
@@ -1389,7 +1586,7 @@
         modeCar: "汽车",
         modeMixed: "混合",
         modeOther: "其他",
-        phWageAmount: "例如 42",
+        phWageAmount: "例如 82000",
         phWorkHoursWeek: "例如 37.5",
         phDailyMins: "例如 70",
         phDaysWeek: "例如 4",
@@ -1397,6 +1594,8 @@
         phCostUnit: "燃油、磨损、票价等",
         phFixedMonthly: "月票、停车、保险分摊",
         phWeeksYear: "例如 46",
+        phHouseholdAdults: "例如 2",
+        phMortgageRate: "例如 5.0",
         phOrigin: "家庭地址或区域",
         phDestination: "工作地址或区域",
         errWageAmount: "工资金额必须大于 0。",
@@ -1408,6 +1607,8 @@
         errCostUnit: "每单位距离成本必须大于等于 0。",
         errFixedMonthly: "每月固定成本必须大于等于 0。",
         errWeeksYear: "每年工作周数必须在 0-52 之间。",
+        errHouseholdAdults: "纳入的成年人数量必须在 1 到 12 之间。",
+        errMortgageRate: "房贷利率必须在 0 到 25 之间。",
         alertFix: "请修正以下内容：",
         resultHeadline: "每周通勤 {hours} 小时",
         resultSub: "基于 {mins} 分钟/天、{days} 天/周、{weeks} 周/年。",
@@ -1420,9 +1621,19 @@
         reportAnnualTime: "每年通勤时间",
         reportAnnualDistance: "每年通勤距离",
         reportAnnualTimeValue: "每年时间价值",
+        reportAnnualIndirect: "每年间接成本（时间/机会成本）",
         reportAnnualDirect: "每年直接支出",
+        reportDirectDistance: "直接可变距离成本",
+        reportDirectFixed: "直接固定交通成本",
         reportAnnualTotal: "每年总负担",
         reportMonthlyAverage: "月平均负担",
+        reportScope: "范围",
+        reportAdultsIncluded: "纳入成年人",
+        reportHousingSection: "住房视角（可选）",
+        reportRentEquivalent: "等效月租预算",
+        reportMortgageEquivalent: "等效房贷本金（30年）",
+        reportMortgageRate: "房贷利率假设",
+        reportHouseholdAssumption: "假设每位纳入成年人使用相同的通勤画像。",
         alertFillFirst: "请先填写计算器输入项。",
         shareText: "我的通勤每年大约花费 {annualTotal}（每周 {weeklyHours} 小时、每年 {annualDistance} {distanceUnit}）。由 CommutingValue 计算。",
         alertSummaryCopied: "摘要已复制。",
@@ -1434,7 +1645,8 @@
         alertCleared: "会话数据已清除。",
         derivedHourlyHint: "计算时薪：{hourly}",
         derivedHourlyNeedInput: "计算时薪：请输入工资金额。",
-        derivedHourlyNeedHours: "计算时薪：请输入每周工作小时以换算月薪/年薪。"
+        derivedHourlyNeedHours: "计算时薪：请输入每周工作小时以换算月薪/年薪。",
+        derivedHourlyAssumed: "计算时薪（按 {hours} 小时/周估算）：{hourly}"
       },
       no: {
         pageTitle: "CommutingValue - Den reelle kostnaden ved pendling",
@@ -1457,6 +1669,7 @@
         labelWageMode: "Lønnsmodus",
         labelWageAmount: "Lønnsbeløp (før skatt)",
         labelWorkHoursWeek: "Arbeidstimer per uke",
+        workHoursHint: "Påkrevd når du bruker måneds- eller årslønn.",
         wageModeHourly: "Timelønn",
         wageModeMonthly: "Månedslønn",
         wageModeYearly: "Årslønn",
@@ -1470,6 +1683,22 @@
         labelFixedMonthly: "Fast månedlig transportkostnad",
         labelWeeksYear: "Arbeidsuker per år",
         labelTransportMode: "Primær transportmåte (valgfritt)",
+        labelScopeMode: "Beregningsomfang",
+        labelHouseholdSizeMode: "Husstandsoppsett",
+        householdSizeHint: "Start med én voksen, og legg til flere kun ved behov.",
+        householdSizeOne: "Én voksen",
+        householdSizeMulti: "Mer enn én voksen",
+        labelHouseholdAdults: "Antall voksne inkludert",
+        scopeHint: "Husstandsmodus bruker samme pendleprofil for hver inkluderte voksen.",
+        scopeSelf: "Bare meg",
+        scopeHousehold: "Husstand (voksne)",
+        housingLensTitle: "Hvor mye bolig er dette?",
+        housingLensHint: "Valgfri leie- og boliglånsvinkel",
+        labelHousingLensEnabled: "Boligsammenligning",
+        housingLensOff: "Av",
+        housingLensOn: "På",
+        labelMortgageRate: "Boliglånsrente (%)",
+        housingLensNote: "Bruker en 30-årig annuitetslån-tilnærming fra månedlig pendlebelastning.",
         distanceHelperTitle: "Avstandshjelper",
         distanceHelperHint: "Valgfritt. Bruk dette kun hvis du vil ha hjelp til avstandsestimat.",
         labelOrigin: "Start",
@@ -1495,6 +1724,9 @@
         kpiAnnualTimeValue: "Årlig tidsverdi",
         kpiAnnualDirect: "Årlige direkte kostnader",
         kpiAnnualTotal: "Årlig totalbelastning",
+        kpiRentEquivalent: "Tilsvarende leie (månedlig)",
+        kpiMortgageEquivalent: "Tilsvarende boliglån (30-årig hovedstol)",
+        kpiAdultsApplied: "Voksne inkludert",
         reportTitle: "CommutingValue-rapport",
         privacyNote: "Personvern: kalkulator- og turdata lagres i <code>sessionStorage</code> og slettes når nettleserøkten avsluttes.",
         trackerCardTitle: "Manuell tracker",
@@ -1521,7 +1753,7 @@
         modeCar: "Bil",
         modeMixed: "Kombinert",
         modeOther: "Annet",
-        phWageAmount: "f.eks. 42",
+        phWageAmount: "f.eks. 82000",
         phWorkHoursWeek: "f.eks. 37.5",
         phDailyMins: "f.eks. 70",
         phDaysWeek: "f.eks. 4",
@@ -1529,6 +1761,8 @@
         phCostUnit: "drivstoff, slitasje, billett",
         phFixedMonthly: "periodekort, parkering, forsikring",
         phWeeksYear: "f.eks. 46",
+        phHouseholdAdults: "f.eks. 2",
+        phMortgageRate: "f.eks. 5.0",
         phOrigin: "Hjemadresse eller område",
         phDestination: "Jobbadresse eller område",
         errWageAmount: "Lønnsbeløp må være større enn 0.",
@@ -1540,6 +1774,8 @@
         errCostUnit: "Kostnad per enhet må være 0 eller mer.",
         errFixedMonthly: "Fast månedskostnad må være 0 eller mer.",
         errWeeksYear: "Uker per år må være 0-52.",
+        errHouseholdAdults: "Antall voksne inkludert må være mellom 1 og 12.",
+        errMortgageRate: "Boliglånsrente må være mellom 0 og 25.",
         alertFix: "Rett opp følgende:",
         resultHeadline: "{hours} timer/uke pendling",
         resultSub: "Basert på {mins} min/dag, {days} dager/uke, {weeks} uker/år.",
@@ -1552,9 +1788,19 @@
         reportAnnualTime: "Årlig pendletid",
         reportAnnualDistance: "Årlig pendleavstand",
         reportAnnualTimeValue: "Årlig tidsverdi",
+        reportAnnualIndirect: "Årlig indirekte kostnad (tid/mulighetskostnad)",
         reportAnnualDirect: "Årlige direkte kostnader",
+        reportDirectDistance: "Direkte variabel avstandskostnad",
+        reportDirectFixed: "Direkte fast transportkostnad",
         reportAnnualTotal: "Årlig totalbelastning",
         reportMonthlyAverage: "Månedlig snittbelastning",
+        reportScope: "Omfang",
+        reportAdultsIncluded: "Voksne inkludert",
+        reportHousingSection: "Boligvinkel (valgfritt)",
+        reportRentEquivalent: "Tilsvarende månedlig leiebudsjett",
+        reportMortgageEquivalent: "Tilsvarende boliglånshovedstol (30 år)",
+        reportMortgageRate: "Forutsatt boliglånsrente",
+        reportHouseholdAssumption: "Forutsetter samme pendleprofil for hver inkluderte voksen.",
         alertFillFirst: "Fyll ut kalkulatoren først.",
         shareText: "Pendlingen min koster omtrent {annualTotal} per år ({weeklyHours} timer/uke, {annualDistance} {distanceUnit}/år). Beregnet med CommutingValue.",
         alertSummaryCopied: "Oppsummering kopiert.",
@@ -1566,7 +1812,8 @@
         alertCleared: "Øktdata slettet.",
         derivedHourlyHint: "Beregnet timelønn: {hourly}",
         derivedHourlyNeedInput: "Beregnet timelønn: legg inn lønnsbeløp.",
-        derivedHourlyNeedHours: "Beregnet timelønn: legg inn arbeidstimer/uke for lønnskonvertering."
+        derivedHourlyNeedHours: "Beregnet timelønn: legg inn arbeidstimer/uke for lønnskonvertering.",
+        derivedHourlyAssumed: "Beregnet timelønn (antar {hours} t/uke): {hourly}"
       },
       sv: {
         pageTitle: "CommutingValue - Den verkliga kostnaden för pendling",
@@ -1589,6 +1836,7 @@
         labelWageMode: "Löneläge",
         labelWageAmount: "Lönebelopp (före skatt)",
         labelWorkHoursWeek: "Arbetstimmar per vecka",
+        workHoursHint: "Krävs när du använder månads- eller årslön.",
         wageModeHourly: "Timlön",
         wageModeMonthly: "Månadslön",
         wageModeYearly: "Årslön",
@@ -1602,6 +1850,22 @@
         labelFixedMonthly: "Fast månatlig transportkostnad",
         labelWeeksYear: "Arbetsveckor per år",
         labelTransportMode: "Primärt transportmedel (valfritt)",
+        labelScopeMode: "Beräkningsomfång",
+        labelHouseholdSizeMode: "Hushållsinställning",
+        householdSizeHint: "Börja med en vuxen och lägg till fler endast vid behov.",
+        householdSizeOne: "En vuxen",
+        householdSizeMulti: "Fler än en vuxen",
+        labelHouseholdAdults: "Antal vuxna inkluderade",
+        scopeHint: "Hushållsläge använder samma pendlingsprofil för varje inkluderad vuxen.",
+        scopeSelf: "Bara jag",
+        scopeHousehold: "Hushåll (vuxna)",
+        housingLensTitle: "Hur mycket boende motsvarar detta?",
+        housingLensHint: "Valfri hyres- och bolånelins",
+        labelHousingLensEnabled: "Bostadsjämförelse",
+        housingLensOff: "Av",
+        housingLensOn: "På",
+        labelMortgageRate: "Bolåneränta (%)",
+        housingLensNote: "Använder en 30-årig annuitetsapproximation från månatlig pendlingsbelastning.",
         distanceHelperTitle: "Avståndshjälp",
         distanceHelperHint: "Valfritt. Använd bara om du vill få hjälp att uppskatta avstånd.",
         labelOrigin: "Start",
@@ -1627,6 +1891,9 @@
         kpiAnnualTimeValue: "Årligt tidsvärde",
         kpiAnnualDirect: "Årlig direkt kostnad",
         kpiAnnualTotal: "Årlig total belastning",
+        kpiRentEquivalent: "Motsvarande hyra (månad)",
+        kpiMortgageEquivalent: "Motsvarande bolån (30-årigt kapital)",
+        kpiAdultsApplied: "Vuxna inkluderade",
         reportTitle: "CommutingValue-rapport",
         privacyNote: "Integritetsnotis: kalkylator- och resedata lagras i <code>sessionStorage</code> och rensas när webbläsarsessionen avslutas.",
         trackerCardTitle: "Manuell tracker",
@@ -1653,7 +1920,7 @@
         modeCar: "Bil",
         modeMixed: "Blandat",
         modeOther: "Annat",
-        phWageAmount: "t.ex. 42",
+        phWageAmount: "t.ex. 82000",
         phWorkHoursWeek: "t.ex. 37.5",
         phDailyMins: "t.ex. 70",
         phDaysWeek: "t.ex. 4",
@@ -1661,6 +1928,8 @@
         phCostUnit: "bränsle, slitage, biljett",
         phFixedMonthly: "kort, parkering, försäkring",
         phWeeksYear: "t.ex. 46",
+        phHouseholdAdults: "t.ex. 2",
+        phMortgageRate: "t.ex. 5.0",
         phOrigin: "Hemadress eller område",
         phDestination: "Arbetsadress eller område",
         errWageAmount: "Lönebeloppet måste vara större än 0.",
@@ -1672,6 +1941,8 @@
         errCostUnit: "Kostnad per enhet måste vara 0 eller mer.",
         errFixedMonthly: "Fast månadskostnad måste vara 0 eller mer.",
         errWeeksYear: "Veckor per år måste vara 0-52.",
+        errHouseholdAdults: "Antal inkluderade vuxna måste vara mellan 1 och 12.",
+        errMortgageRate: "Bolåneräntan måste vara mellan 0 och 25.",
         alertFix: "Åtgärda följande:",
         resultHeadline: "{hours} timmar/vecka pendling",
         resultSub: "Baserat på {mins} min/dag, {days} dagar/vecka, {weeks} veckor/år.",
@@ -1684,9 +1955,19 @@
         reportAnnualTime: "Årlig pendlingstid",
         reportAnnualDistance: "Årligt pendlingsavstånd",
         reportAnnualTimeValue: "Årligt tidsvärde",
+        reportAnnualIndirect: "Årlig indirekt kostnad (tid/alternativkostnad)",
         reportAnnualDirect: "Årlig direkt kostnad",
+        reportDirectDistance: "Direkt rörlig avståndskostnad",
+        reportDirectFixed: "Direkt fast transportkostnad",
         reportAnnualTotal: "Årlig total belastning",
         reportMonthlyAverage: "Månatlig snittbelastning",
+        reportScope: "Omfång",
+        reportAdultsIncluded: "Vuxna inkluderade",
+        reportHousingSection: "Bostadslins (valfritt)",
+        reportRentEquivalent: "Motsvarande månatlig hyresbudget",
+        reportMortgageEquivalent: "Motsvarande bolånekapital (30 år)",
+        reportMortgageRate: "Antagen bolåneränta",
+        reportHouseholdAssumption: "Antar samma pendlingsprofil för varje inkluderad vuxen.",
         alertFillFirst: "Fyll i kalkylatorn först.",
         shareText: "Min pendling kostar cirka {annualTotal} per år ({weeklyHours} timmar/vecka, {annualDistance} {distanceUnit}/år). Beräknat med CommutingValue.",
         alertSummaryCopied: "Sammanfattning kopierad.",
@@ -1698,7 +1979,8 @@
         alertCleared: "Sessionsdata rensad.",
         derivedHourlyHint: "Beräknad timlön: {hourly}",
         derivedHourlyNeedInput: "Beräknad timlön: ange lönebelopp.",
-        derivedHourlyNeedHours: "Beräknad timlön: ange arbetstimmar/vecka för löneomräkning."
+        derivedHourlyNeedHours: "Beräknad timlön: ange arbetstimmar/vecka för löneomräkning.",
+        derivedHourlyAssumed: "Beräknad timlön (antar {hours} h/vecka): {hourly}"
       },
       de: {
         pageTitle: "CommutingValue - Die wahren Pendelkosten",
@@ -1721,6 +2003,7 @@
         labelWageMode: "Lohnmodus",
         labelWageAmount: "Lohnbetrag (vor Steuern)",
         labelWorkHoursWeek: "Arbeitsstunden pro Woche",
+        workHoursHint: "Pflichtfeld bei Monats- oder Jahresgehalt.",
         wageModeHourly: "Stundenlohn",
         wageModeMonthly: "Monatsgehalt",
         wageModeYearly: "Jahresgehalt",
@@ -1734,6 +2017,22 @@
         labelFixedMonthly: "Fixe monatliche Transportkosten",
         labelWeeksYear: "Arbeitswochen pro Jahr",
         labelTransportMode: "Primäres Verkehrsmittel (optional)",
+        labelScopeMode: "Berechnungsumfang",
+        labelHouseholdSizeMode: "Haushalts-Setup",
+        householdSizeHint: "Starte mit einer erwachsenen Person und füge nur bei Bedarf weitere hinzu.",
+        householdSizeOne: "Eine erwachsene Person",
+        householdSizeMulti: "Mehr als eine erwachsene Person",
+        labelHouseholdAdults: "Einbezogene Erwachsene",
+        scopeHint: "Im Haushaltsmodus wird dasselbe Pendelprofil auf jede einbezogene erwachsene Person angewendet.",
+        scopeSelf: "Nur ich",
+        scopeHousehold: "Haushalt (Erwachsene)",
+        housingLensTitle: "Wie viel Wohnen ist das?",
+        housingLensHint: "Optionale Miet- und Hypothekenperspektive",
+        labelHousingLensEnabled: "Wohnvergleich",
+        housingLensOff: "Aus",
+        housingLensOn: "An",
+        labelMortgageRate: "Hypothekenzins (%)",
+        housingLensNote: "Verwendet eine 30-jährige Annuitäten-Näherung aus der monatlichen Pendelbelastung.",
         distanceHelperTitle: "Distanz-Helfer",
         distanceHelperHint: "Optional. Nur verwenden, wenn du Hilfe bei der Distanzschätzung möchtest.",
         labelOrigin: "Start",
@@ -1759,6 +2058,9 @@
         kpiAnnualTimeValue: "Jährlicher Zeitwert",
         kpiAnnualDirect: "Jährliche direkte Ausgaben",
         kpiAnnualTotal: "Jährliche Gesamtbelastung",
+        kpiRentEquivalent: "Mietäquivalent (monatlich)",
+        kpiMortgageEquivalent: "Hypothekenäquivalent (30-jährige Kreditsumme)",
+        kpiAdultsApplied: "Einbezogene Erwachsene",
         reportTitle: "CommutingValue-Bericht",
         privacyNote: "Hinweis zum Datenschutz: Rechner- und Fahrtdaten werden in <code>sessionStorage</code> gespeichert und am Ende der Browser-Sitzung gelöscht.",
         trackerCardTitle: "Manueller Tracker",
@@ -1785,7 +2087,7 @@
         modeCar: "Auto",
         modeMixed: "Gemischt",
         modeOther: "Sonstiges",
-        phWageAmount: "z. B. 42",
+        phWageAmount: "z. B. 82000",
         phWorkHoursWeek: "z. B. 37.5",
         phDailyMins: "z. B. 70",
         phDaysWeek: "z. B. 4",
@@ -1793,6 +2095,8 @@
         phCostUnit: "Kraftstoff, Verschleiß, Fahrpreis",
         phFixedMonthly: "Abo, Parken, Versicherungsanteil",
         phWeeksYear: "z. B. 46",
+        phHouseholdAdults: "z. B. 2",
+        phMortgageRate: "z. B. 5.0",
         phOrigin: "Wohnadresse oder Gebiet",
         phDestination: "Arbeitsadresse oder Gebiet",
         errWageAmount: "Der Lohnbetrag muss größer als 0 sein.",
@@ -1804,6 +2108,8 @@
         errCostUnit: "Kosten pro Distanz-Einheit müssen 0 oder mehr sein.",
         errFixedMonthly: "Fixe Monatskosten müssen 0 oder mehr sein.",
         errWeeksYear: "Wochen pro Jahr müssen zwischen 0 und 52 liegen.",
+        errHouseholdAdults: "Einbezogene Erwachsene müssen zwischen 1 und 12 liegen.",
+        errMortgageRate: "Hypothekenzins muss zwischen 0 und 25 liegen.",
         alertFix: "Bitte korrigieren:",
         resultHeadline: "{hours} Stunden/Woche Pendeln",
         resultSub: "Basierend auf {mins} Min/Tag, {days} Tagen/Woche, {weeks} Wochen/Jahr.",
@@ -1816,9 +2122,19 @@
         reportAnnualTime: "Jährliche Pendelzeit",
         reportAnnualDistance: "Jährliche Pendeldistanz",
         reportAnnualTimeValue: "Jährlicher Zeitwert",
+        reportAnnualIndirect: "Jährliche indirekte Kosten (Zeit/Opportunitätskosten)",
         reportAnnualDirect: "Jährliche direkte Ausgaben",
+        reportDirectDistance: "Direkte variable Distanzkosten",
+        reportDirectFixed: "Direkte fixe Transportkosten",
         reportAnnualTotal: "Jährliche Gesamtbelastung",
         reportMonthlyAverage: "Monatliche Durchschnittsbelastung",
+        reportScope: "Umfang",
+        reportAdultsIncluded: "Einbezogene Erwachsene",
+        reportHousingSection: "Wohnperspektive (optional)",
+        reportRentEquivalent: "Entsprechendes monatliches Mietbudget",
+        reportMortgageEquivalent: "Entsprechende Hypotheken-Kreditsumme (30 Jahre)",
+        reportMortgageRate: "Angenommener Hypothekenzins",
+        reportHouseholdAssumption: "Nimmt dasselbe Pendelprofil für jede einbezogene erwachsene Person an.",
         alertFillFirst: "Bitte zuerst die Rechnerfelder ausfüllen.",
         shareText: "Mein Pendeln kostet etwa {annualTotal} pro Jahr ({weeklyHours} Stunden/Woche, {annualDistance} {distanceUnit}/Jahr). Berechnet mit CommutingValue.",
         alertSummaryCopied: "Zusammenfassung kopiert.",
@@ -1830,7 +2146,8 @@
         alertCleared: "Sitzungsdaten gelöscht.",
         derivedHourlyHint: "Berechneter Stundenlohn: {hourly}",
         derivedHourlyNeedInput: "Berechneter Stundenlohn: bitte Lohnbetrag eingeben.",
-        derivedHourlyNeedHours: "Berechneter Stundenlohn: bitte Arbeitsstunden/Woche für Gehaltsumrechnung eingeben."
+        derivedHourlyNeedHours: "Berechneter Stundenlohn: bitte Arbeitsstunden/Woche für Gehaltsumrechnung eingeben.",
+        derivedHourlyAssumed: "Berechneter Stundenlohn (angenommen {hours} Std./Woche): {hourly}"
       }
     };
 
@@ -1870,9 +2187,13 @@
         "scrollToCalc", "heroTrackerBtn", "demoBtn", "pillSession", "pillNoAccount", "pillDistance", "pillPdf",
         "calcTitle", "calcHint", "labelWageMode", "labelWageAmount", "labelWorkHoursWeek", "labelCurrency", "labelDailyMins", "labelDaysWeek", "labelDistanceDay",
         "labelDistanceUnit", "labelCostUnit", "labelFixedMonthly", "labelWeeksYear", "labelTransportMode",
+        "workHoursHint",
+        "labelScopeMode", "labelHouseholdSizeMode", "householdSizeHint", "labelHouseholdAdults", "scopeHint",
+        "housingLensTitle", "housingLensHint", "labelHousingLensEnabled", "labelMortgageRate", "housingLensNote",
         "calcQuickHint", "distanceHelperTitle", "distanceHelperHint", "labelOrigin", "labelDestination",
         "autoDistanceBtn", "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "shareSystemBtn", "shareCopyBtn", "shareSms", "shareReddit", "shareEmail", "pdfBtn",
         "kpiWeeklyTime", "kpiAnnualTime", "kpiAnnualDistance", "kpiAnnualTimeValue", "kpiAnnualDirect", "kpiAnnualTotal",
+        "kpiRentEquivalent", "kpiMortgageEquivalent", "kpiAdultsApplied",
         "reportTitle", "trackerCardTitle", "trackerCardHint", "trackerCardText", "trackerCardBtn",
         "supportEyebrow", "supportLine", "supportLink", "footerSub", "footerTracker", "footerInfo",
         "footerAbout", "footerPrivacy", "footerTerms", "footerTop"
@@ -1890,6 +2211,8 @@
         costPerDistanceUnit: "phCostUnit",
         fixedMonthlyCost: "phFixedMonthly",
         weeksPerYear: "phWeeksYear",
+        householdAdults: "phHouseholdAdults",
+        mortgageRate: "phMortgageRate",
         origin: "phOrigin",
         destination: "phDestination"
       };
@@ -1915,6 +2238,30 @@
         if (wageModeKeys[opt.value]) opt.textContent = t(wageModeKeys[opt.value]);
       });
 
+      const scopeModeKeys = {
+        self: "scopeSelf",
+        household: "scopeHousehold"
+      };
+      Array.from($("scopeMode").options).forEach((opt) => {
+        if (scopeModeKeys[opt.value]) opt.textContent = t(scopeModeKeys[opt.value]);
+      });
+
+      const householdSizeModeKeys = {
+        one: "householdSizeOne",
+        multi: "householdSizeMulti"
+      };
+      Array.from($("householdSizeMode").options).forEach((opt) => {
+        if (householdSizeModeKeys[opt.value]) opt.textContent = t(householdSizeModeKeys[opt.value]);
+      });
+
+      const housingLensKeys = {
+        off: "housingLensOff",
+        on: "housingLensOn"
+      };
+      Array.from($("housingLensEnabled").options).forEach((opt) => {
+        if (housingLensKeys[opt.value]) opt.textContent = t(housingLensKeys[opt.value]);
+      });
+
       const modeKeys = {
         walk: "modeWalk",
         bike: "modeBike",
@@ -1937,6 +2284,8 @@
       }
 
       updateDerivedWageHint();
+      updateScopeUI();
+      updateHousingLensUI();
     }
 
     function initLanguage() {
@@ -1996,6 +2345,72 @@
       return NaN;
     }
 
+    function clampAdults(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 1;
+      return Math.min(12, Math.max(1, Math.round(n)));
+    }
+
+    function setAdultsCount(value) {
+      const next = clampAdults(value);
+      $("householdAdults").value = String(next);
+      $("householdAdultsLabel").textContent = String(next);
+      return next;
+    }
+
+    function updateHouseholdSizeUI() {
+      const scope = $("scopeMode").value;
+      const sizeMode = $("householdSizeMode").value;
+      const stepper = $("householdAdultsStepper");
+      if (scope !== "household") {
+        stepper.style.display = "none";
+        setAdultsCount(1);
+        return;
+      }
+      if (sizeMode === "multi") {
+        stepper.style.display = "inline-flex";
+        const current = Number($("householdAdults").value);
+        setAdultsCount(current >= 2 ? current : 2);
+        return;
+      }
+      stepper.style.display = "none";
+      setAdultsCount(1);
+    }
+
+    function updateScopeUI() {
+      const scope = $("scopeMode").value;
+      const block = $("householdAdultsBlock");
+      const scopeBlock = $("scopeModeBlock");
+      if (scope === "household") {
+        scopeBlock.style.gridColumn = "";
+        block.style.display = "block";
+        updateHouseholdSizeUI();
+        return;
+      }
+      scopeBlock.style.gridColumn = "1 / -1";
+      block.style.display = "none";
+      $("householdSizeMode").value = "one";
+      setAdultsCount(1);
+    }
+
+    function updateHousingLensUI() {
+      const enabled = $("housingLensEnabled").value === "on";
+      const rateInput = $("mortgageRate");
+      rateInput.disabled = !enabled;
+      if (!enabled && !rateInput.value) {
+        rateInput.value = "5.0";
+      }
+    }
+
+    function mortgagePrincipalFromPayment(monthlyPayment, annualRatePct, years = 30) {
+      const n = years * 12;
+      if (!(monthlyPayment > 0)) return 0;
+      const r = (annualRatePct / 100) / 12;
+      if (Math.abs(r) < 1e-10) return monthlyPayment * n;
+      const factor = Math.pow(1 + r, n);
+      return monthlyPayment * ((factor - 1) / (r * factor));
+    }
+
     function readCalcInputs() {
       const base = {
         wageMode: $("wageMode").value,
@@ -2009,7 +2424,12 @@
         costPerDistanceUnit: Number($("costPerDistanceUnit").value),
         fixedMonthlyCost: Number($("fixedMonthlyCost").value),
         weeksPerYear: Number($("weeksPerYear").value),
-        transportMode: $("transportMode").value || null
+        transportMode: $("transportMode").value || null,
+        scopeMode: $("scopeMode").value,
+        householdSizeMode: $("householdSizeMode").value,
+        householdAdults: Number($("householdAdults").value),
+        housingLensEnabled: $("housingLensEnabled").value === "on",
+        mortgageRate: Number($("mortgageRate").value)
       };
       return {
         ...base,
@@ -2049,27 +2469,48 @@
       if (!(v.costPerDistanceUnit >= 0)) issues.push(t("errCostUnit"));
       if (!(v.fixedMonthlyCost >= 0)) issues.push(t("errFixedMonthly"));
       if (!(v.weeksPerYear >= 0 && v.weeksPerYear <= 52)) issues.push(t("errWeeksYear"));
+      if (!(Number.isInteger(v.householdAdults) && v.householdAdults >= 1 && v.householdAdults <= 12)) issues.push(t("errHouseholdAdults"));
+      if (v.housingLensEnabled && !(v.mortgageRate >= 0 && v.mortgageRate <= 25)) issues.push(t("errMortgageRate"));
       return issues;
     }
 
     function compute(v) {
-      const weeklyHours = (v.dailyCommuteMins * v.daysPerWeek) / 60;
-      const annualHours = weeklyHours * v.weeksPerYear;
-      const annualDistance = v.distancePerDay * v.daysPerWeek * v.weeksPerYear;
-      const annualTimeCost = annualHours * v.wage;
-      const annualDistanceCost = annualDistance * v.costPerDistanceUnit;
-      const annualFixedCost = v.fixedMonthlyCost * 12;
+      const adultsIncluded = (v.scopeMode === "household" && v.householdSizeMode === "multi") ? v.householdAdults : 1;
+      const weeklyHoursPerAdult = (v.dailyCommuteMins * v.daysPerWeek) / 60;
+      const annualHoursPerAdult = weeklyHoursPerAdult * v.weeksPerYear;
+      const annualDistancePerAdult = v.distancePerDay * v.daysPerWeek * v.weeksPerYear;
+      const annualTimeCostPerAdult = annualHoursPerAdult * v.wage;
+      const annualDistanceCostPerAdult = annualDistancePerAdult * v.costPerDistanceUnit;
+      const annualFixedCostPerAdult = v.fixedMonthlyCost * 12;
+      const annualDirectCostPerAdult = annualDistanceCostPerAdult + annualFixedCostPerAdult;
+
+      const weeklyHours = weeklyHoursPerAdult * adultsIncluded;
+      const annualHours = annualHoursPerAdult * adultsIncluded;
+      const annualDistance = annualDistancePerAdult * adultsIncluded;
+      const annualTimeCost = annualTimeCostPerAdult * adultsIncluded;
+      const annualDistanceCost = annualDistanceCostPerAdult * adultsIncluded;
+      const annualFixedCost = annualFixedCostPerAdult * adultsIncluded;
       const annualDirectCost = annualDistanceCost + annualFixedCost;
       const annualTotal = annualTimeCost + annualDirectCost;
+      const monthlyTotal = annualTotal / 12;
+      const monthlyRentEquivalent = monthlyTotal;
+      const mortgageEquivalent = v.housingLensEnabled
+        ? mortgagePrincipalFromPayment(monthlyRentEquivalent, v.mortgageRate, 30)
+        : NaN;
 
       return {
+        adultsIncluded,
         weeklyHours,
         annualHours,
         annualDistance,
         annualTimeCost,
+        annualDistanceCost,
+        annualFixedCost,
         annualDirectCost,
         annualTotal,
-        monthlyTotal: annualTotal / 12
+        monthlyTotal,
+        monthlyRentEquivalent,
+        mortgageEquivalent
       };
     }
 
@@ -2077,17 +2518,27 @@
       $("calcResults").style.display = "block";
       $("headlineResult").textContent = tmpl("resultHeadline", { hours: out.weeklyHours.toFixed(1) });
       const annualDays = out.annualHours / 24;
+      const scopeText = `${t("reportAdultsIncluded")}: ${out.adultsIncluded}.`;
+      const assumptionText = out.adultsIncluded > 1 ? ` ${t("reportHouseholdAssumption")}` : "";
       $("subResult").textContent = `${tmpl("resultSub", {
         mins: v.dailyCommuteMins,
         days: v.daysPerWeek,
         weeks: v.weeksPerYear
-      })} ${tmpl("resultImpactDays", { days: annualDays.toFixed(1) })} ${tmpl("effectiveHourlyWageText", { hourly: formatMoney(v.wage, v.currency) })}`;
+      })} ${tmpl("resultImpactDays", { days: annualDays.toFixed(1) })} ${tmpl("effectiveHourlyWageText", { hourly: formatMoney(v.wage, v.currency) })} ${scopeText}${assumptionText}`;
       $("weeklyHours").textContent = `${out.weeklyHours.toFixed(1)} h`;
       $("annualHours").textContent = `${out.annualHours.toFixed(0)} h`;
       $("annualDistance").textContent = `${out.annualDistance.toFixed(0)} ${v.distanceUnit}`;
       $("annualTimeCost").textContent = formatMoney(out.annualTimeCost, v.currency);
       $("annualDirectCost").textContent = formatMoney(out.annualDirectCost, v.currency);
       $("annualTotal").textContent = formatMoney(out.annualTotal, v.currency);
+      $("adultsApplied").textContent = String(out.adultsIncluded);
+      if (v.housingLensEnabled) {
+        $("housingKpiRow").style.display = "grid";
+        $("rentEquivalent").textContent = formatMoney(out.monthlyRentEquivalent, v.currency);
+        $("mortgageEquivalent").textContent = formatMoney(out.mortgageEquivalent, v.currency);
+      } else {
+        $("housingKpiRow").style.display = "none";
+      }
       renderReport(v, out);
     }
 
@@ -2098,14 +2549,24 @@
       });
       $("reportBody").innerHTML = `
         <strong>${t("reportSummaryTitle")}</strong><br>
+        ${t("reportScope")}: <strong>${v.scopeMode === "household" ? t("scopeHousehold") : t("scopeSelf")}</strong><br>
+        ${t("reportAdultsIncluded")}: <strong>${out.adultsIncluded}</strong><br>
         ${t("reportHourlyWage")}: <strong>${formatMoney(v.wage, v.currency)}</strong><br>
         ${t("reportWeeklyTime")}: <strong>${out.weeklyHours.toFixed(1)} h</strong><br>
         ${t("reportAnnualTime")}: <strong>${out.annualHours.toFixed(0)} h</strong><br>
         ${t("reportAnnualDistance")}: <strong>${out.annualDistance.toFixed(0)} ${v.distanceUnit}</strong><br><br>
-        ${t("reportAnnualTimeValue")}: <strong>${formatMoney(out.annualTimeCost, v.currency)}</strong><br>
+        ${t("reportAnnualIndirect")}: <strong>${formatMoney(out.annualTimeCost, v.currency)}</strong><br>
         ${t("reportAnnualDirect")}: <strong>${formatMoney(out.annualDirectCost, v.currency)}</strong><br>
+        ${t("reportDirectDistance")}: <strong>${formatMoney(out.annualDistanceCost, v.currency)}</strong><br>
+        ${t("reportDirectFixed")}: <strong>${formatMoney(out.annualFixedCost, v.currency)}</strong><br>
         ${t("reportAnnualTotal")}: <strong>${formatMoney(out.annualTotal, v.currency)}</strong><br>
-        ${t("reportMonthlyAverage")}: <strong>${formatMoney(out.monthlyTotal, v.currency)}</strong>
+        ${t("reportMonthlyAverage")}: <strong>${formatMoney(out.monthlyTotal, v.currency)}</strong><br>
+        ${v.housingLensEnabled ? `
+          <br><strong>${t("reportHousingSection")}</strong><br>
+          ${t("reportMortgageRate")}: <strong>${v.mortgageRate.toFixed(1)}%</strong><br>
+          ${t("reportRentEquivalent")}: <strong>${formatMoney(out.monthlyRentEquivalent, v.currency)}</strong><br>
+          ${t("reportMortgageEquivalent")}: <strong>${formatMoney(out.mortgageEquivalent, v.currency)}</strong>
+        ` : ""}
       `;
     }
 
@@ -2140,12 +2601,33 @@
       $("costPerDistanceUnit").value = saved.costPerDistanceUnit ?? "";
       $("fixedMonthlyCost").value = saved.fixedMonthlyCost ?? "";
       $("weeksPerYear").value = saved.weeksPerYear ?? "";
+      $("scopeMode").value = saved.scopeMode ?? "self";
+      $("householdSizeMode").value = saved.householdSizeMode ?? "one";
+      $("householdAdults").value = saved.householdAdults ?? "1";
+      $("housingLensEnabled").value = saved.housingLensEnabled ? "on" : "off";
+      $("mortgageRate").value = saved.mortgageRate ?? "5.0";
       const savedMode = saved.transportMode ?? "";
       $("transportMode").value = modeMap[savedMode] || savedMode;
+      updateScopeUI();
+      updateHousingLensUI();
+    }
+
+    function applySimpleDefaults() {
+      if (!$("wageMode").value) $("wageMode").value = "yearly";
+      if (!$("daysPerWeek").value) $("daysPerWeek").value = "5";
+      if (!$("weeksPerYear").value) $("weeksPerYear").value = "46";
+      if (!$("scopeMode").value) $("scopeMode").value = "self";
+      if (!$("householdSizeMode").value) $("householdSizeMode").value = "one";
+      if (!$("householdAdults").value) $("householdAdults").value = "1";
+      if (!$("housingLensEnabled").value) $("housingLensEnabled").value = "off";
+      if (!$("mortgageRate").value) $("mortgageRate").value = "5.0";
+      updateScopeUI();
+      updateHousingLensUI();
     }
 
     initTheme();
     loadCalc();
+    applySimpleDefaults();
     initLanguage();
 
     $("themeBtn").addEventListener("click", () => {
@@ -2156,6 +2638,28 @@
     ["wageMode", "wageAmount", "workHoursPerWeek", "currency"].forEach((id) => {
       $(id).addEventListener("input", updateDerivedWageHint);
       $(id).addEventListener("change", updateDerivedWageHint);
+    });
+
+    ["scopeMode", "householdSizeMode", "householdAdults"].forEach((id) => {
+      $(id).addEventListener("input", updateScopeUI);
+      $(id).addEventListener("change", updateScopeUI);
+    });
+
+    $("adultsMinus").addEventListener("click", () => {
+      if ($("scopeMode").value !== "household") return;
+      const curr = Number($("householdAdults").value) || 1;
+      setAdultsCount(curr - 1);
+    });
+
+    $("adultsPlus").addEventListener("click", () => {
+      if ($("scopeMode").value !== "household") return;
+      const curr = Number($("householdAdults").value) || 1;
+      setAdultsCount(curr + 1);
+    });
+
+    ["housingLensEnabled", "mortgageRate"].forEach((id) => {
+      $(id).addEventListener("input", updateHousingLensUI);
+      $(id).addEventListener("change", updateHousingLensUI);
     });
 
     $("scrollToCalc").addEventListener("click", () => {
@@ -2404,22 +2908,34 @@
         "costPerDistanceUnit",
         "fixedMonthlyCost",
         "weeksPerYear",
+        "householdAdults",
+        "mortgageRate",
         "transportMode",
         "origin",
         "destination"
       ].forEach((id) => { $(id).value = ""; });
-      $("wageMode").value = "hourly";
+      $("wageMode").value = "yearly";
       $("currency").value = "USD";
       $("distanceUnit").value = "km";
+      $("scopeMode").value = "self";
+      $("householdSizeMode").value = "one";
+      $("householdAdults").value = "1";
+      $("housingLensEnabled").value = "off";
+      $("mortgageRate").value = "5.0";
+      $("daysPerWeek").value = "5";
+      $("weeksPerYear").value = "46";
       $("calcResults").style.display = "none";
+      $("housingKpiRow").style.display = "none";
       $("reportCard").style.display = "none";
+      updateScopeUI();
+      updateHousingLensUI();
       updateDerivedWageHint();
       alert(t("alertCleared"));
     });
 
     $("demoBtn").addEventListener("click", () => {
-      $("wageMode").value = "hourly";
-      $("wageAmount").value = "42";
+      $("wageMode").value = "yearly";
+      $("wageAmount").value = "82000";
       $("workHoursPerWeek").value = "37.5";
       $("currency").value = "USD";
       $("dailyCommuteMins").value = "70";
@@ -2430,8 +2946,15 @@
       $("fixedMonthlyCost").value = "120";
       $("weeksPerYear").value = "46";
       $("transportMode").value = "train";
+      $("scopeMode").value = "self";
+      $("householdSizeMode").value = "one";
+      $("householdAdults").value = "1";
+      $("housingLensEnabled").value = "on";
+      $("mortgageRate").value = "5.0";
       $("origin").value = "Home";
       $("destination").value = "Office";
+      updateScopeUI();
+      updateHousingLensUI();
       updateDerivedWageHint();
       $("calcBtn").click();
       $("calc").scrollIntoView({ behavior: "smooth" });
