@@ -304,6 +304,28 @@
       gap: 12px;
     }
 
+    .calc-quick {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .calc-quick .fine {
+      margin: 0;
+    }
+
+    .auto-status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 18px;
+    }
+
+    .auto-status.ok { color: var(--ok); }
+    .auto-status.warn { color: var(--danger); }
+
     label {
       display: block;
       margin: 9px 0 6px;
@@ -713,7 +735,32 @@
 
         <div class="row">
           <div>
-            <label id="labelDistanceDay" for="distancePerDay">Daily commuting distance (round-trip km or miles)</label>
+            <label id="labelWeeksYear" for="weeksPerYear">Weeks worked per year</label>
+            <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" placeholder="e.g., 46" />
+          </div>
+          <div>
+            <label id="labelTransportMode" for="transportMode">Primary transport mode (optional)</label>
+            <select id="transportMode">
+              <option value="">-</option>
+              <option value="walk">Walk</option>
+              <option value="bike">Bike</option>
+              <option value="bus">Bus</option>
+              <option value="train">Train</option>
+              <option value="car">Car</option>
+              <option value="mixed">Mixed</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="calc-quick hidden-print">
+          <button class="btn primary" id="calcBtn" type="button">Calculate</button>
+          <p class="fine" id="calcQuickHint">You can calculate without distance. Distance is optional.</p>
+        </div>
+
+        <div class="row">
+          <div>
+            <label id="labelDistanceDay" for="distancePerDay">Daily commuting distance (optional, round-trip km or miles)</label>
             <input id="distancePerDay" type="number" min="0" inputmode="decimal" placeholder="e.g., 32" />
           </div>
           <div>
@@ -736,31 +783,11 @@
           </div>
         </div>
 
-        <div class="row">
-          <div>
-            <label id="labelWeeksYear" for="weeksPerYear">Weeks worked per year</label>
-            <input id="weeksPerYear" type="number" min="0" max="52" inputmode="numeric" placeholder="e.g., 46" />
-          </div>
-          <div>
-            <label id="labelTransportMode" for="transportMode">Primary transport mode (optional)</label>
-            <select id="transportMode">
-              <option value="">-</option>
-              <option value="walk">Walk</option>
-              <option value="bike">Bike</option>
-              <option value="bus">Bus</option>
-              <option value="train">Train</option>
-              <option value="car">Car</option>
-              <option value="mixed">Mixed</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-
         <div class="divider hidden-print"></div>
 
         <div class="section-title hidden-print" style="margin-bottom:8px;">
           <h2 id="distanceHelperTitle">Distance helper</h2>
-          <div class="hint" id="distanceHelperHint">Opens map routes in a new tab</div>
+          <div class="hint" id="distanceHelperHint">Optional. Use this only if you want help estimating distance.</div>
         </div>
         <div class="row hidden-print">
           <div>
@@ -773,12 +800,13 @@
           </div>
         </div>
         <div class="hero-ctas hidden-print" style="margin-top:10px;">
+          <button class="btn" id="autoDistanceBtn" type="button">Auto-calculate distance</button>
           <button class="btn" id="openGoogleRoute" type="button">Open Google Maps route</button>
           <button class="btn" id="openOSMRoute" type="button">Open OpenStreetMap route</button>
         </div>
+        <div class="auto-status hidden-print" id="distanceAutoStatus"></div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;" class="hidden-print">
-          <button class="btn primary" id="calcBtn" type="button">Calculate</button>
           <button class="btn" id="shareBtn" type="button">Copy summary</button>
           <button class="btn" id="pdfBtn" type="button">Export PDF report</button>
         </div>
@@ -915,16 +943,21 @@
         labelCurrency: "Currency",
         labelDailyMins: "Daily commuting time (round-trip minutes)",
         labelDaysWeek: "Workdays commuting per week",
-        labelDistanceDay: "Daily commuting distance (round-trip km or miles)",
+        calcQuickHint: "You can calculate without distance. Distance is optional.",
+        labelDistanceDay: "Daily commuting distance (optional, round-trip km or miles)",
         labelDistanceUnit: "Distance unit",
         labelCostUnit: "Direct transport cost per km/mi",
         labelFixedMonthly: "Fixed monthly transport cost",
         labelWeeksYear: "Weeks worked per year",
         labelTransportMode: "Primary transport mode (optional)",
         distanceHelperTitle: "Distance helper",
-        distanceHelperHint: "Opens map routes in a new tab",
+        distanceHelperHint: "Optional. Use this only if you want help estimating distance.",
         labelOrigin: "Origin",
         labelDestination: "Destination",
+        autoDistanceBtn: "Auto-calculate distance",
+        autoDistanceLoading: "Estimating distance...",
+        autoDistanceSuccess: "Estimated round-trip distance set to {distance} {unit}.",
+        autoDistanceError: "Could not auto-calculate distance. Please check origin/destination or enter distance manually.",
         openGoogleRoute: "Open Google Maps route",
         openOSMRoute: "Open OpenStreetMap route",
         calcBtn: "Calculate",
@@ -984,6 +1017,7 @@
         alertFix: "Please fix:",
         resultHeadline: "{hours} hours/week commuting",
         resultSub: "Based on {mins} min/day, {days} days/week, {weeks} weeks/year.",
+        resultImpactDays: "That is about {days} full days per year in transit.",
         effectiveHourlyWageText: "Effective hourly wage used: {hourly}.",
         reportGenerated: "Generated {time}",
         reportSummaryTitle: "Summary",
@@ -1033,16 +1067,21 @@
         labelCurrency: "Moneda",
         labelDailyMins: "Tiempo diario de desplazamiento (ida y vuelta en minutos)",
         labelDaysWeek: "Días de trabajo con desplazamiento por semana",
-        labelDistanceDay: "Distancia diaria de desplazamiento (ida y vuelta en km o millas)",
+        calcQuickHint: "Puedes calcular sin distancia. La distancia es opcional.",
+        labelDistanceDay: "Distancia diaria de desplazamiento (opcional, ida y vuelta en km o millas)",
         labelDistanceUnit: "Unidad de distancia",
         labelCostUnit: "Coste directo de transporte por km/mi",
         labelFixedMonthly: "Coste fijo mensual de transporte",
         labelWeeksYear: "Semanas trabajadas al año",
         labelTransportMode: "Modo principal de transporte (opcional)",
         distanceHelperTitle: "Asistente de distancia",
-        distanceHelperHint: "Abre rutas en un mapa en una nueva pestaña",
+        distanceHelperHint: "Opcional. Úsalo solo si quieres ayuda para estimar distancia.",
         labelOrigin: "Origen",
         labelDestination: "Destino",
+        autoDistanceBtn: "Autocalcular distancia",
+        autoDistanceLoading: "Estimando distancia...",
+        autoDistanceSuccess: "Distancia ida y vuelta estimada: {distance} {unit}.",
+        autoDistanceError: "No se pudo calcular la distancia automáticamente. Revisa origen/destino o introdúcela manualmente.",
         openGoogleRoute: "Abrir ruta en Google Maps",
         openOSMRoute: "Abrir ruta en OpenStreetMap",
         calcBtn: "Calcular",
@@ -1102,6 +1141,7 @@
         alertFix: "Corrige lo siguiente:",
         resultHeadline: "{hours} horas/semana de desplazamiento",
         resultSub: "Basado en {mins} min/día, {days} días/semana, {weeks} semanas/año.",
+        resultImpactDays: "Eso equivale a unos {days} días completos al año en tránsito.",
         effectiveHourlyWageText: "Salario por hora aplicado: {hourly}.",
         reportGenerated: "Generado {time}",
         reportSummaryTitle: "Resumen",
@@ -1151,16 +1191,21 @@
         labelCurrency: "货币",
         labelDailyMins: "每日通勤时间（往返分钟）",
         labelDaysWeek: "每周通勤工作日",
-        labelDistanceDay: "每日通勤距离（往返 km 或 mi）",
+        calcQuickHint: "不填距离也可以计算。距离是可选项。",
+        labelDistanceDay: "每日通勤距离（可选，往返 km 或 mi）",
         labelDistanceUnit: "距离单位",
         labelCostUnit: "每公里/英里直接交通成本",
         labelFixedMonthly: "每月固定交通成本",
         labelWeeksYear: "每年工作周数",
         labelTransportMode: "主要通勤方式（可选）",
         distanceHelperTitle: "距离助手",
-        distanceHelperHint: "在新标签页打开地图路线",
+        distanceHelperHint: "可选。仅在你需要估算距离时使用。",
         labelOrigin: "起点",
         labelDestination: "终点",
+        autoDistanceBtn: "自动计算距离",
+        autoDistanceLoading: "正在估算距离...",
+        autoDistanceSuccess: "已填入估算往返距离：{distance} {unit}。",
+        autoDistanceError: "自动计算距离失败。请检查起点/终点，或手动输入距离。",
         openGoogleRoute: "打开 Google Maps 路线",
         openOSMRoute: "打开 OpenStreetMap 路线",
         calcBtn: "计算",
@@ -1220,6 +1265,7 @@
         alertFix: "请修正以下内容：",
         resultHeadline: "每周通勤 {hours} 小时",
         resultSub: "基于 {mins} 分钟/天、{days} 天/周、{weeks} 周/年。",
+        resultImpactDays: "这相当于每年约 {days} 个整天花在通勤上。",
         effectiveHourlyWageText: "采用的时薪：{hourly}。",
         reportGenerated: "生成时间：{time}",
         reportSummaryTitle: "摘要",
@@ -1269,16 +1315,21 @@
         labelCurrency: "Valuta",
         labelDailyMins: "Daglig pendletid (tur/retur i minutter)",
         labelDaysWeek: "Arbeidsdager med pendling per uke",
-        labelDistanceDay: "Daglig pendleavstand (tur/retur km eller miles)",
+        calcQuickHint: "Du kan beregne uten avstand. Avstand er valgfritt.",
+        labelDistanceDay: "Daglig pendleavstand (valgfritt, tur/retur km eller miles)",
         labelDistanceUnit: "Avstandsenhet",
         labelCostUnit: "Direkte transportkostnad per km/mi",
         labelFixedMonthly: "Fast månedlig transportkostnad",
         labelWeeksYear: "Arbeidsuker per år",
         labelTransportMode: "Primær transportmåte (valgfritt)",
         distanceHelperTitle: "Avstandshjelper",
-        distanceHelperHint: "Åpner ruter i kart i ny fane",
+        distanceHelperHint: "Valgfritt. Bruk dette kun hvis du vil ha hjelp til avstandsestimat.",
         labelOrigin: "Start",
         labelDestination: "Mål",
+        autoDistanceBtn: "Beregn avstand automatisk",
+        autoDistanceLoading: "Estimerer avstand...",
+        autoDistanceSuccess: "Estimert tur/retur-avstand satt til {distance} {unit}.",
+        autoDistanceError: "Kunne ikke beregne avstand automatisk. Sjekk start/mål eller fyll inn manuelt.",
         openGoogleRoute: "Åpne Google Maps-rute",
         openOSMRoute: "Åpne OpenStreetMap-rute",
         calcBtn: "Beregn",
@@ -1338,6 +1389,7 @@
         alertFix: "Rett opp følgende:",
         resultHeadline: "{hours} timer/uke pendling",
         resultSub: "Basert på {mins} min/dag, {days} dager/uke, {weeks} uker/år.",
+        resultImpactDays: "Det tilsvarer omtrent {days} hele døgn i året i transport.",
         effectiveHourlyWageText: "Effektiv timelønn brukt: {hourly}.",
         reportGenerated: "Generert {time}",
         reportSummaryTitle: "Oppsummering",
@@ -1387,16 +1439,21 @@
         labelCurrency: "Valuta",
         labelDailyMins: "Daglig pendlingstid (tur och retur i minuter)",
         labelDaysWeek: "Arbetsdagar med pendling per vecka",
-        labelDistanceDay: "Dagligt pendlingsavstånd (tur och retur km eller miles)",
+        calcQuickHint: "Du kan beräkna utan avstånd. Avstånd är valfritt.",
+        labelDistanceDay: "Dagligt pendlingsavstånd (valfritt, tur och retur km eller miles)",
         labelDistanceUnit: "Avståndsenhet",
         labelCostUnit: "Direkt transportkostnad per km/mi",
         labelFixedMonthly: "Fast månatlig transportkostnad",
         labelWeeksYear: "Arbetsveckor per år",
         labelTransportMode: "Primärt transportmedel (valfritt)",
         distanceHelperTitle: "Avståndshjälp",
-        distanceHelperHint: "Öppnar rutter i ny flik",
+        distanceHelperHint: "Valfritt. Använd bara om du vill få hjälp att uppskatta avstånd.",
         labelOrigin: "Start",
         labelDestination: "Mål",
+        autoDistanceBtn: "Beräkna avstånd automatiskt",
+        autoDistanceLoading: "Uppskattar avstånd...",
+        autoDistanceSuccess: "Beräknat tur-och-retur-avstånd satt till {distance} {unit}.",
+        autoDistanceError: "Kunde inte beräkna avstånd automatiskt. Kontrollera start/mål eller ange manuellt.",
         openGoogleRoute: "Öppna Google Maps-rutt",
         openOSMRoute: "Öppna OpenStreetMap-rutt",
         calcBtn: "Beräkna",
@@ -1456,6 +1513,7 @@
         alertFix: "Åtgärda följande:",
         resultHeadline: "{hours} timmar/vecka pendling",
         resultSub: "Baserat på {mins} min/dag, {days} dagar/vecka, {weeks} veckor/år.",
+        resultImpactDays: "Det motsvarar ungefär {days} hela dagar per år i transit.",
         effectiveHourlyWageText: "Använd beräknad timlön: {hourly}.",
         reportGenerated: "Genererad {time}",
         reportSummaryTitle: "Sammanfattning",
@@ -1505,16 +1563,21 @@
         labelCurrency: "Währung",
         labelDailyMins: "Tägliche Pendelzeit (Hin- und Rückweg in Minuten)",
         labelDaysWeek: "Pendel-Arbeitstage pro Woche",
-        labelDistanceDay: "Tägliche Pendeldistanz (Hin- und Rückweg km oder mi)",
+        calcQuickHint: "Du kannst auch ohne Distanz berechnen. Distanz ist optional.",
+        labelDistanceDay: "Tägliche Pendeldistanz (optional, Hin- und Rückweg km oder mi)",
         labelDistanceUnit: "Distanz-Einheit",
         labelCostUnit: "Direkte Transportkosten pro km/mi",
         labelFixedMonthly: "Fixe monatliche Transportkosten",
         labelWeeksYear: "Arbeitswochen pro Jahr",
         labelTransportMode: "Primäres Verkehrsmittel (optional)",
         distanceHelperTitle: "Distanz-Helfer",
-        distanceHelperHint: "Öffnet Kartenrouten in neuem Tab",
+        distanceHelperHint: "Optional. Nur verwenden, wenn du Hilfe bei der Distanzschätzung möchtest.",
         labelOrigin: "Start",
         labelDestination: "Ziel",
+        autoDistanceBtn: "Distanz automatisch berechnen",
+        autoDistanceLoading: "Distanz wird geschätzt...",
+        autoDistanceSuccess: "Geschätzte Hin-und-Rückweg-Distanz gesetzt: {distance} {unit}.",
+        autoDistanceError: "Distanz konnte nicht automatisch berechnet werden. Bitte Start/Ziel prüfen oder manuell eingeben.",
         openGoogleRoute: "Google-Maps-Route öffnen",
         openOSMRoute: "OpenStreetMap-Route öffnen",
         calcBtn: "Berechnen",
@@ -1574,6 +1637,7 @@
         alertFix: "Bitte korrigieren:",
         resultHeadline: "{hours} Stunden/Woche Pendeln",
         resultSub: "Basierend auf {mins} Min/Tag, {days} Tagen/Woche, {weeks} Wochen/Jahr.",
+        resultImpactDays: "Das sind ungefähr {days} volle Tage pro Jahr unterwegs.",
         effectiveHourlyWageText: "Verwendeter effektiver Stundenlohn: {hourly}.",
         reportGenerated: "Erstellt {time}",
         reportSummaryTitle: "Zusammenfassung",
@@ -1635,8 +1699,8 @@
         "scrollToCalc", "heroTrackerBtn", "demoBtn", "pillSession", "pillNoAccount", "pillDistance", "pillPdf",
         "calcTitle", "calcHint", "labelWageMode", "labelWageAmount", "labelWorkHoursWeek", "labelCurrency", "labelDailyMins", "labelDaysWeek", "labelDistanceDay",
         "labelDistanceUnit", "labelCostUnit", "labelFixedMonthly", "labelWeeksYear", "labelTransportMode",
-        "distanceHelperTitle", "distanceHelperHint", "labelOrigin", "labelDestination",
-        "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "pdfBtn",
+        "calcQuickHint", "distanceHelperTitle", "distanceHelperHint", "labelOrigin", "labelDestination",
+        "autoDistanceBtn", "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "pdfBtn",
         "kpiWeeklyTime", "kpiAnnualTime", "kpiAnnualDistance", "kpiAnnualTimeValue", "kpiAnnualDirect", "kpiAnnualTotal",
         "reportTitle", "trackerCardTitle", "trackerCardHint", "trackerCardText", "trackerCardBtn",
         "supportEyebrow", "supportLine", "supportLink", "footerSub", "footerTracker", "footerInfo",
@@ -1841,11 +1905,12 @@
     function renderResults(v, out) {
       $("calcResults").style.display = "block";
       $("headlineResult").textContent = tmpl("resultHeadline", { hours: out.weeklyHours.toFixed(1) });
+      const annualDays = out.annualHours / 24;
       $("subResult").textContent = `${tmpl("resultSub", {
         mins: v.dailyCommuteMins,
         days: v.daysPerWeek,
         weeks: v.weeksPerYear
-      })} ${tmpl("effectiveHourlyWageText", { hourly: formatMoney(v.wage, v.currency) })}`;
+      })} ${tmpl("resultImpactDays", { days: annualDays.toFixed(1) })} ${tmpl("effectiveHourlyWageText", { hourly: formatMoney(v.wage, v.currency) })}`;
       $("weeklyHours").textContent = `${out.weeklyHours.toFixed(1)} h`;
       $("annualHours").textContent = `${out.annualHours.toFixed(0)} h`;
       $("annualDistance").textContent = `${out.annualDistance.toFixed(0)} ${v.distanceUnit}`;
@@ -1983,12 +2048,88 @@
       window.open(url, "_blank", "noopener,noreferrer");
     }
 
+    function setDistanceStatus(type, message) {
+      const box = $("distanceAutoStatus");
+      box.textContent = message || "";
+      box.classList.remove("ok", "warn");
+      if (type === "ok") box.classList.add("ok");
+      if (type === "warn") box.classList.add("warn");
+    }
+
+    async function fetchCoordinates(query) {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      if (!response.ok) throw new Error("geocode_failed");
+      const data = await response.json();
+      if (!Array.isArray(data) || !data.length) throw new Error("geocode_empty");
+      return {
+        lat: Number(data[0].lat),
+        lon: Number(data[0].lon)
+      };
+    }
+
+    async function autoCalculateDistance() {
+      const origin = $("origin").value.trim();
+      const destination = $("destination").value.trim();
+      if (!origin || !destination) {
+        alert(t("alertOriginDest"));
+        return;
+      }
+
+      const button = $("autoDistanceBtn");
+      const originalLabel = button.textContent;
+      button.disabled = true;
+      button.textContent = t("autoDistanceLoading");
+      setDistanceStatus(null, t("autoDistanceLoading"));
+
+      try {
+        const [from, to] = await Promise.all([
+          fetchCoordinates(origin),
+          fetchCoordinates(destination)
+        ]);
+        const routeUrl = `https://router.project-osrm.org/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false`;
+        const routeResponse = await fetch(routeUrl, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        if (!routeResponse.ok) throw new Error("route_failed");
+        const routeData = await routeResponse.json();
+        const meters = routeData?.routes?.[0]?.distance;
+        if (!(meters > 0)) throw new Error("route_empty");
+
+        const oneWayKm = meters / 1000;
+        const roundTripKm = oneWayKm * 2;
+        const isMiles = $("distanceUnit").value === "mi";
+        const roundTripDistance = isMiles ? (roundTripKm * 0.621371) : roundTripKm;
+        $("distancePerDay").value = roundTripDistance.toFixed(1);
+        const unit = isMiles ? "mi" : "km";
+        setDistanceStatus("ok", tmpl("autoDistanceSuccess", {
+          distance: roundTripDistance.toFixed(1),
+          unit
+        }));
+      } catch {
+        setDistanceStatus("warn", t("autoDistanceError"));
+      } finally {
+        button.disabled = false;
+        button.textContent = originalLabel;
+      }
+    }
+
     $("openGoogleRoute").addEventListener("click", () => {
       openRoute((origin, destination) => {
         const o = encodeURIComponent(origin);
         const d = encodeURIComponent(destination);
         return `https://www.google.com/maps/dir/?api=1&origin=${o}&destination=${d}&travelmode=driving`;
       });
+    });
+
+    $("autoDistanceBtn").addEventListener("click", () => {
+      autoCalculateDistance();
     });
 
     $("openOSMRoute").addEventListener("click", () => {
