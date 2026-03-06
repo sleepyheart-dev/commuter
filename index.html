@@ -213,8 +213,11 @@
 
     .btn.ghost { background: transparent; }
     .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger), var(--panel) 72%); }
+    .btn.slim { padding: 7px 10px; font-size: 12px; font-weight: 650; border-radius: 999px; }
 
     .hero {
+      position: relative;
+      overflow: hidden;
       background: var(--panel);
       border: 1px solid color-mix(in srgb, var(--border), #ffffff 28%);
       border-radius: var(--radius);
@@ -223,6 +226,22 @@
       margin-bottom: 18px;
       backdrop-filter: blur(var(--glass-blur));
       -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .hero-art {
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      width: clamp(170px, 23vw, 230px);
+      height: auto;
+      opacity: 0.78;
+      pointer-events: none;
+      filter: drop-shadow(0 10px 20px rgba(31, 74, 103, 0.08));
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 2;
     }
 
     .hero h1 {
@@ -314,6 +333,66 @@
 
     .calc-quick .fine {
       margin: 0;
+    }
+
+    .share-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .share-wrap.open .btn.slim {
+      border-color: color-mix(in srgb, var(--accent), #ffffff 28%);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 84%);
+    }
+
+    .share-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 90;
+      min-width: 200px;
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--panel), #ffffff 14%);
+      backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+      -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+      box-shadow: 0 14px 26px rgba(34, 58, 83, 0.14);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+    }
+
+    .share-wrap.open .share-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .share-action {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--panel), #ffffff 18%);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 650;
+      padding: 8px 10px;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .share-action:hover {
+      border-color: color-mix(in srgb, var(--accent), #ffffff 30%);
+      text-decoration: none;
     }
 
     .auto-status {
@@ -590,6 +669,7 @@
 
     @media (max-width: 930px) {
       .grid { grid-template-columns: 1fr; }
+      .hero-art { display: none; }
       .tracker-card {
         margin-top: 0;
         flex-direction: column;
@@ -638,7 +718,7 @@
     <header class="topbar hidden-print">
       <div class="brand" aria-label="CommutingValue">
         <img class="brand-logo" src="assets/logo-wordmark.svg" alt="CommutingValue logo" />
-        <div class="brand-sub" id="brandSub">True cost of commuting, session-private</div>
+        <div class="brand-sub" id="brandSub">Know Your Commute. Own Your Time.</div>
       </div>
       <div class="topbar-right">
         <div class="lang-switch">
@@ -662,12 +742,46 @@
     </header>
 
     <section class="hero">
-      <h1 id="heroTitle">See what your commute really costs in time, money, and life-hours.</h1>
+      <h1 id="heroTitle">What does your commute really cost you?</h1>
       <p id="heroText">
         Enter your daily commute time, distance, and cost assumptions.
         Get a clear weekly and annual report you can share.
         Data is stored in this browser session only.
       </p>
+      <p class="fine" id="housingNote" style="margin-top:10px;">
+        Also useful when comparing homes or apartments: a cheaper property can become expensive once long-term commuting costs are included.
+      </p>
+      <svg class="hero-art" viewBox="0 0 320 180" aria-hidden="true">
+        <defs>
+          <linearGradient id="laneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8cb7c7" stop-opacity="0.95" />
+            <stop offset="100%" stop-color="#2d5f78" stop-opacity="0.95" />
+          </linearGradient>
+          <linearGradient id="trainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4f95ad" />
+            <stop offset="100%" stop-color="#1f4a67" />
+          </linearGradient>
+        </defs>
+        <path d="M24 128 C74 72, 176 74, 296 32" fill="none" stroke="url(#laneGrad)" stroke-width="14" stroke-linecap="round" />
+        <path d="M22 144 C88 92, 198 98, 300 52" fill="none" stroke="#d8e7ee" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="2 10" />
+        <g transform="translate(78,92)">
+          <rect x="0" y="0" width="66" height="30" rx="9" fill="url(#trainGrad)" />
+          <rect x="8" y="6" width="16" height="9" rx="2" fill="#eaf5fb" />
+          <rect x="28" y="6" width="16" height="9" rx="2" fill="#eaf5fb" />
+          <circle cx="14" cy="30" r="4" fill="#214157" />
+          <circle cx="50" cy="30" r="4" fill="#214157" />
+        </g>
+        <g transform="translate(198,62)">
+          <circle cx="10" cy="18" r="9" fill="none" stroke="#2f7d57" stroke-width="3.4" />
+          <circle cx="36" cy="18" r="9" fill="none" stroke="#2f7d57" stroke-width="3.4" />
+          <path d="M10 18 L20 9 L30 18 L20 18 Z" fill="none" stroke="#2f7d57" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round" />
+          <path d="M20 9 L24 9" fill="none" stroke="#2f7d57" stroke-width="3.4" stroke-linecap="round" />
+        </g>
+        <g transform="translate(250,20)">
+          <circle cx="10" cy="10" r="10" fill="#1f4a67" opacity="0.9" />
+          <path d="M10 10 L10 4 M10 10 L15 10" stroke="#f4fbff" stroke-width="2.2" stroke-linecap="round" />
+        </g>
+      </svg>
       <div class="hero-ctas hidden-print">
         <button class="btn primary" type="button" id="scrollToCalc">Run calculator</button>
         <a class="btn" id="heroTrackerBtn" href="tracker.html">Open manual tracker</a>
@@ -807,7 +921,16 @@
         <div class="auto-status hidden-print" id="distanceAutoStatus"></div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;" class="hidden-print">
-          <button class="btn" id="shareBtn" type="button">Copy summary</button>
+          <div class="share-wrap" id="shareWrap">
+            <button class="btn slim" id="shareBtn" type="button" aria-expanded="false" aria-controls="shareMenu">Share result</button>
+            <div class="share-menu" id="shareMenu" role="menu" aria-hidden="true">
+              <button class="share-action" id="shareSystemBtn" type="button">System share</button>
+              <button class="share-action" id="shareCopyBtn" type="button">Copy text</button>
+              <a class="share-action" id="shareSms" href="#">iMessage / SMS</a>
+              <a class="share-action" id="shareReddit" href="#" target="_blank" rel="noopener noreferrer">Reddit</a>
+              <a class="share-action" id="shareEmail" href="#">Email</a>
+            </div>
+          </div>
           <button class="btn" id="pdfBtn" type="button">Export PDF report</button>
         </div>
 
@@ -919,12 +1042,13 @@
     const I18N = {
       en: {
         pageTitle: "CommutingValue - True Cost of Your Commute",
-        brandSub: "True cost of commuting, session-private",
+        brandSub: "Know Your Commute. Own Your Time.",
         navTrackerBtn: "Manual tracker",
         themeBtn: "Theme",
         resetBtn: "Reset session data",
-        heroTitle: "See what your commute really costs in time, money, and life-hours.",
+        heroTitle: "What does your commute really cost you?",
         heroText: "Enter your daily commute time, distance, and cost assumptions. Get a clear weekly and annual report you can share. Data is stored in this browser session only.",
+        housingNote: "Also useful when comparing homes or apartments: a cheaper property can become expensive once long-term commuting costs are included.",
         scrollToCalc: "Run calculator",
         heroTrackerBtn: "Open manual tracker",
         demoBtn: "Load demo values",
@@ -961,7 +1085,13 @@
         openGoogleRoute: "Open Google Maps route",
         openOSMRoute: "Open OpenStreetMap route",
         calcBtn: "Calculate",
-        shareBtn: "Copy summary",
+        shareBtn: "Share result",
+        shareSystemBtn: "System share",
+        shareCopyBtn: "Copy text",
+        shareSms: "iMessage / SMS",
+        shareReddit: "Reddit",
+        shareEmail: "Email",
+        shareEmailSubject: "My CommutingValue result",
         pdfBtn: "Export PDF report",
         kpiWeeklyTime: "Weekly commute time",
         kpiAnnualTime: "Annual commute time",
@@ -1032,6 +1162,7 @@
         alertFillFirst: "Fill calculator inputs first.",
         shareText: "My commute costs about {annualTotal} per year ({weeklyHours} hours/week, {annualDistance} {distanceUnit}/year). Calculated with CommutingValue.",
         alertSummaryCopied: "Summary copied.",
+        alertSystemShareUnavailable: "System share is not available on this device.",
         promptCopy: "Copy this:",
         alertCalculateFirst: "Calculate first so the report has values.",
         alertOriginDest: "Enter both origin and destination.",
@@ -1043,12 +1174,13 @@
       },
       es: {
         pageTitle: "CommutingValue - Costo real de tu desplazamiento",
-        brandSub: "Costo real del trayecto, privado por sesión",
+        brandSub: "Conoce tu trayecto. Haz tuyo tu tiempo.",
         navTrackerBtn: "Rastreador manual",
         themeBtn: "Tema",
         resetBtn: "Restablecer datos de sesión",
-        heroTitle: "Descubre cuánto cuesta realmente tu desplazamiento en tiempo, dinero y horas de vida.",
+        heroTitle: "¿Cuánto te cuesta realmente tu desplazamiento?",
         heroText: "Introduce tu tiempo diario de viaje, distancia y supuestos de coste. Obtén un informe semanal y anual claro para compartir. Los datos se guardan solo en esta sesión del navegador.",
+        housingNote: "También es útil al comparar viviendas o apartamentos: una propiedad más barata puede salir cara cuando incluyes el coste real del desplazamiento.",
         scrollToCalc: "Calcular ahora",
         heroTrackerBtn: "Abrir rastreador manual",
         demoBtn: "Cargar ejemplo",
@@ -1085,7 +1217,13 @@
         openGoogleRoute: "Abrir ruta en Google Maps",
         openOSMRoute: "Abrir ruta en OpenStreetMap",
         calcBtn: "Calcular",
-        shareBtn: "Copiar resumen",
+        shareBtn: "Compartir resultado",
+        shareSystemBtn: "Compartir del sistema",
+        shareCopyBtn: "Copiar texto",
+        shareSms: "iMessage / SMS",
+        shareReddit: "Reddit",
+        shareEmail: "Correo",
+        shareEmailSubject: "Mi resultado de CommutingValue",
         pdfBtn: "Exportar informe PDF",
         kpiWeeklyTime: "Tiempo semanal de desplazamiento",
         kpiAnnualTime: "Tiempo anual de desplazamiento",
@@ -1156,6 +1294,7 @@
         alertFillFirst: "Primero completa la calculadora.",
         shareText: "Mi desplazamiento cuesta aprox. {annualTotal} al año ({weeklyHours} horas/semana, {annualDistance} {distanceUnit}/año). Calculado con CommutingValue.",
         alertSummaryCopied: "Resumen copiado.",
+        alertSystemShareUnavailable: "La función de compartir del sistema no está disponible en este dispositivo.",
         promptCopy: "Copia esto:",
         alertCalculateFirst: "Calcula primero para generar el informe.",
         alertOriginDest: "Introduce origen y destino.",
@@ -1167,12 +1306,13 @@
       },
       zh: {
         pageTitle: "CommutingValue - 通勤真实成本计算器",
-        brandSub: "通勤真实成本，数据仅限本次会话",
+        brandSub: "看清通勤，掌控时间。",
         navTrackerBtn: "手动追踪器",
         themeBtn: "主题",
         resetBtn: "重置会话数据",
-        heroTitle: "看清你的通勤在时间、金钱与生命小时上的真实成本。",
+        heroTitle: "你的通勤到底在让你付出什么成本？",
         heroText: "输入每日通勤时间、距离和成本假设，立即得到可分享的周报与年报。数据仅保存在当前浏览器会话中。",
+        housingNote: "在比较房子或公寓时也很有用：看似更便宜的房产，算上长期通勤成本后可能并不便宜。",
         scrollToCalc: "开始计算",
         heroTrackerBtn: "打开手动追踪器",
         demoBtn: "加载示例",
@@ -1209,7 +1349,13 @@
         openGoogleRoute: "打开 Google Maps 路线",
         openOSMRoute: "打开 OpenStreetMap 路线",
         calcBtn: "计算",
-        shareBtn: "复制摘要",
+        shareBtn: "分享结果",
+        shareSystemBtn: "系统分享",
+        shareCopyBtn: "复制文本",
+        shareSms: "iMessage / 短信",
+        shareReddit: "Reddit",
+        shareEmail: "邮件",
+        shareEmailSubject: "我的 CommutingValue 结果",
         pdfBtn: "导出 PDF 报告",
         kpiWeeklyTime: "每周通勤时间",
         kpiAnnualTime: "每年通勤时间",
@@ -1280,6 +1426,7 @@
         alertFillFirst: "请先填写计算器输入项。",
         shareText: "我的通勤每年大约花费 {annualTotal}（每周 {weeklyHours} 小时、每年 {annualDistance} {distanceUnit}）。由 CommutingValue 计算。",
         alertSummaryCopied: "摘要已复制。",
+        alertSystemShareUnavailable: "此设备不支持系统分享。",
         promptCopy: "请复制：",
         alertCalculateFirst: "请先计算再导出报告。",
         alertOriginDest: "请填写起点和终点。",
@@ -1291,12 +1438,13 @@
       },
       no: {
         pageTitle: "CommutingValue - Den reelle kostnaden ved pendling",
-        brandSub: "Reell pendlekostnad, privat i denne økten",
+        brandSub: "Kjenn pendlingen din. Ta eierskap til tiden din.",
         navTrackerBtn: "Manuell tracker",
         themeBtn: "Tema",
         resetBtn: "Nullstill øktdata",
-        heroTitle: "Se hva pendlingen din faktisk koster i tid, penger og livstimer.",
+        heroTitle: "Hva koster pendlingen din deg egentlig?",
         heroText: "Legg inn daglig pendletid, avstand og kostnadsantakelser. Få en tydelig ukes- og årsrapport du kan dele. Data lagres kun i denne nettleserøkten.",
+        housingNote: "Nyttig også når du vurderer bolig eller leilighet: en rimeligere bolig kan bli dyr når langsiktige pendlekostnader tas med.",
         scrollToCalc: "Kjør kalkulator",
         heroTrackerBtn: "Åpne manuell tracker",
         demoBtn: "Last inn demo",
@@ -1333,7 +1481,13 @@
         openGoogleRoute: "Åpne Google Maps-rute",
         openOSMRoute: "Åpne OpenStreetMap-rute",
         calcBtn: "Beregn",
-        shareBtn: "Kopier oppsummering",
+        shareBtn: "Del resultat",
+        shareSystemBtn: "Systemdeling",
+        shareCopyBtn: "Kopier tekst",
+        shareSms: "iMessage / SMS",
+        shareReddit: "Reddit",
+        shareEmail: "E-post",
+        shareEmailSubject: "Mitt CommutingValue-resultat",
         pdfBtn: "Eksporter PDF-rapport",
         kpiWeeklyTime: "Ukentlig pendletid",
         kpiAnnualTime: "Årlig pendletid",
@@ -1404,6 +1558,7 @@
         alertFillFirst: "Fyll ut kalkulatoren først.",
         shareText: "Pendlingen min koster omtrent {annualTotal} per år ({weeklyHours} timer/uke, {annualDistance} {distanceUnit}/år). Beregnet med CommutingValue.",
         alertSummaryCopied: "Oppsummering kopiert.",
+        alertSystemShareUnavailable: "Systemdeling er ikke tilgjengelig på denne enheten.",
         promptCopy: "Kopier dette:",
         alertCalculateFirst: "Beregn først så rapporten får verdier.",
         alertOriginDest: "Legg inn både start og mål.",
@@ -1415,12 +1570,13 @@
       },
       sv: {
         pageTitle: "CommutingValue - Den verkliga kostnaden för pendling",
-        brandSub: "Verklig pendlingskostnad, privat i sessionen",
+        brandSub: "Känn din pendling. Äg din tid.",
         navTrackerBtn: "Manuell tracker",
         themeBtn: "Tema",
         resetBtn: "Återställ sessionsdata",
-        heroTitle: "Se vad din pendling verkligen kostar i tid, pengar och livstimmar.",
+        heroTitle: "Vad kostar din pendling dig egentligen?",
         heroText: "Ange daglig pendlingstid, avstånd och kostnadsantaganden. Få en tydlig vecko- och årsrapport som du kan dela. Data sparas endast i den här webbläsarsessionen.",
+        housingNote: "Användbar även när du jämför hus eller lägenheter: en billigare bostad kan bli dyr när långsiktiga pendlingskostnader räknas in.",
         scrollToCalc: "Kör kalkylatorn",
         heroTrackerBtn: "Öppna manuell tracker",
         demoBtn: "Ladda demo",
@@ -1457,7 +1613,13 @@
         openGoogleRoute: "Öppna Google Maps-rutt",
         openOSMRoute: "Öppna OpenStreetMap-rutt",
         calcBtn: "Beräkna",
-        shareBtn: "Kopiera sammanfattning",
+        shareBtn: "Dela resultat",
+        shareSystemBtn: "Systemdelning",
+        shareCopyBtn: "Kopiera text",
+        shareSms: "iMessage / SMS",
+        shareReddit: "Reddit",
+        shareEmail: "E-post",
+        shareEmailSubject: "Mitt CommutingValue-resultat",
         pdfBtn: "Exportera PDF-rapport",
         kpiWeeklyTime: "Veckovis pendlingstid",
         kpiAnnualTime: "Årlig pendlingstid",
@@ -1528,6 +1690,7 @@
         alertFillFirst: "Fyll i kalkylatorn först.",
         shareText: "Min pendling kostar cirka {annualTotal} per år ({weeklyHours} timmar/vecka, {annualDistance} {distanceUnit}/år). Beräknat med CommutingValue.",
         alertSummaryCopied: "Sammanfattning kopierad.",
+        alertSystemShareUnavailable: "Systemdelning är inte tillgänglig på den här enheten.",
         promptCopy: "Kopiera detta:",
         alertCalculateFirst: "Beräkna först så att rapporten får värden.",
         alertOriginDest: "Ange både start och mål.",
@@ -1539,12 +1702,13 @@
       },
       de: {
         pageTitle: "CommutingValue - Die wahren Pendelkosten",
-        brandSub: "Wahre Pendelkosten, nur in dieser Sitzung gespeichert",
+        brandSub: "Kenne dein Pendeln. Bestimme über deine Zeit.",
         navTrackerBtn: "Manueller Tracker",
         themeBtn: "Design",
         resetBtn: "Sitzungsdaten zurücksetzen",
-        heroTitle: "Sieh, was dein Pendeln wirklich an Zeit, Geld und Lebensstunden kostet.",
+        heroTitle: "Was kostet dich dein Pendeln wirklich?",
         heroText: "Gib tägliche Pendelzeit, Distanz und Kostenannahmen ein. Erhalte einen klaren Wochen- und Jahresbericht zum Teilen. Daten werden nur in dieser Browser-Sitzung gespeichert.",
+        housingNote: "Auch hilfreich beim Vergleich von Haus- oder Wohnungsangeboten: Eine günstigere Immobilie kann teuer werden, wenn langfristige Pendelkosten einbezogen werden.",
         scrollToCalc: "Rechner starten",
         heroTrackerBtn: "Manuellen Tracker öffnen",
         demoBtn: "Demo laden",
@@ -1581,7 +1745,13 @@
         openGoogleRoute: "Google-Maps-Route öffnen",
         openOSMRoute: "OpenStreetMap-Route öffnen",
         calcBtn: "Berechnen",
-        shareBtn: "Zusammenfassung kopieren",
+        shareBtn: "Ergebnis teilen",
+        shareSystemBtn: "Systemfreigabe",
+        shareCopyBtn: "Text kopieren",
+        shareSms: "iMessage / SMS",
+        shareReddit: "Reddit",
+        shareEmail: "E-Mail",
+        shareEmailSubject: "Mein CommutingValue-Ergebnis",
         pdfBtn: "PDF-Bericht exportieren",
         kpiWeeklyTime: "Wöchentliche Pendelzeit",
         kpiAnnualTime: "Jährliche Pendelzeit",
@@ -1652,6 +1822,7 @@
         alertFillFirst: "Bitte zuerst die Rechnerfelder ausfüllen.",
         shareText: "Mein Pendeln kostet etwa {annualTotal} pro Jahr ({weeklyHours} Stunden/Woche, {annualDistance} {distanceUnit}/Jahr). Berechnet mit CommutingValue.",
         alertSummaryCopied: "Zusammenfassung kopiert.",
+        alertSystemShareUnavailable: "Systemfreigabe ist auf diesem Gerät nicht verfügbar.",
         promptCopy: "Hier kopieren:",
         alertCalculateFirst: "Bitte zuerst berechnen, damit der Bericht Werte enthält.",
         alertOriginDest: "Bitte Start und Ziel eingeben.",
@@ -1695,12 +1866,12 @@
       $("langSelect").value = currentLang;
 
       [
-        "brandSub", "navTrackerBtn", "themeBtn", "resetBtn", "heroTitle", "heroText",
+        "brandSub", "navTrackerBtn", "themeBtn", "resetBtn", "heroTitle", "heroText", "housingNote",
         "scrollToCalc", "heroTrackerBtn", "demoBtn", "pillSession", "pillNoAccount", "pillDistance", "pillPdf",
         "calcTitle", "calcHint", "labelWageMode", "labelWageAmount", "labelWorkHoursWeek", "labelCurrency", "labelDailyMins", "labelDaysWeek", "labelDistanceDay",
         "labelDistanceUnit", "labelCostUnit", "labelFixedMonthly", "labelWeeksYear", "labelTransportMode",
         "calcQuickHint", "distanceHelperTitle", "distanceHelperHint", "labelOrigin", "labelDestination",
-        "autoDistanceBtn", "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "pdfBtn",
+        "autoDistanceBtn", "openGoogleRoute", "openOSMRoute", "calcBtn", "shareBtn", "shareSystemBtn", "shareCopyBtn", "shareSms", "shareReddit", "shareEmail", "pdfBtn",
         "kpiWeeklyTime", "kpiAnnualTime", "kpiAnnualDistance", "kpiAnnualTimeValue", "kpiAnnualDirect", "kpiAnnualTotal",
         "reportTitle", "trackerCardTitle", "trackerCardHint", "trackerCardText", "trackerCardBtn",
         "supportEyebrow", "supportLine", "supportLink", "footerSub", "footerTracker", "footerInfo",
@@ -2003,12 +2174,14 @@
       renderResults(v, out);
     });
 
-    $("shareBtn").addEventListener("click", async () => {
+    let latestSharePayload = null;
+
+    function buildSharePayload() {
       const v = readCalcInputs();
       const issues = validateInputs(v);
       if (issues.length) {
         alert(t("alertFillFirst"));
-        return;
+        return null;
       }
       const out = compute(v);
       const text = tmpl("shareText", {
@@ -2017,12 +2190,91 @@
         annualDistance: out.annualDistance.toFixed(0),
         distanceUnit: v.distanceUnit
       });
+      return {
+        title: "CommutingValue",
+        text,
+        url: `${window.location.origin}${window.location.pathname}`
+      };
+    }
+
+    function closeShareMenu() {
+      $("shareWrap").classList.remove("open");
+      $("shareBtn").setAttribute("aria-expanded", "false");
+      $("shareMenu").setAttribute("aria-hidden", "true");
+    }
+
+    function openShareMenu(payload) {
+      latestSharePayload = payload;
+      const body = encodeURIComponent(`${payload.text}\n${payload.url}`);
+      $("shareSms").href = `sms:?&body=${body}`;
+      $("shareReddit").href = `https://www.reddit.com/submit?url=${encodeURIComponent(payload.url)}&title=${encodeURIComponent(payload.text)}`;
+      $("shareEmail").href = `mailto:?subject=${encodeURIComponent(t("shareEmailSubject"))}&body=${body}`;
+      $("shareSystemBtn").style.display = navigator.share ? "block" : "none";
+      $("shareWrap").classList.add("open");
+      $("shareBtn").setAttribute("aria-expanded", "true");
+      $("shareMenu").setAttribute("aria-hidden", "false");
+    }
+
+    async function copyShareText(payload) {
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(payload.text);
         alert(t("alertSummaryCopied"));
       } catch {
-        prompt(t("promptCopy"), text);
+        prompt(t("promptCopy"), payload.text);
       }
+    }
+
+    $("shareBtn").addEventListener("click", (event) => {
+      event.stopPropagation();
+      if ($("shareWrap").classList.contains("open")) {
+        closeShareMenu();
+        return;
+      }
+      const payload = buildSharePayload();
+      if (!payload) return;
+      openShareMenu(payload);
+    });
+
+    $("shareSystemBtn").addEventListener("click", async () => {
+      const payload = latestSharePayload || buildSharePayload();
+      if (!payload) return;
+      if (!navigator.share) {
+        alert(t("alertSystemShareUnavailable"));
+        return;
+      }
+      try {
+        await navigator.share({
+          title: payload.title,
+          text: payload.text,
+          url: payload.url
+        });
+      } catch {
+        // User cancelled or platform rejected share; no blocking alert.
+      }
+      closeShareMenu();
+    });
+
+    $("shareCopyBtn").addEventListener("click", async () => {
+      const payload = latestSharePayload || buildSharePayload();
+      if (!payload) return;
+      await copyShareText(payload);
+      closeShareMenu();
+    });
+
+    ["shareSms", "shareReddit", "shareEmail"].forEach((id) => {
+      $(id).addEventListener("click", () => {
+        closeShareMenu();
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!$("shareWrap").classList.contains("open")) return;
+      if (!$("shareWrap").contains(event.target)) closeShareMenu();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      closeShareMenu();
     });
 
     $("pdfBtn").addEventListener("click", () => {
